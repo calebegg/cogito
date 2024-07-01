@@ -40,6 +40,7 @@ export enum TokenType {
   NIL,
   RETURN,
   REDUCE,
+  PRINT,
 
   EOF,
 }
@@ -54,6 +55,7 @@ const KEYWORDS = new Map([
   ['nil', TokenType.NIL],
   ['return', TokenType.RETURN],
   ['reduce', TokenType.REDUCE],
+  ['print', TokenType.PRINT],
 ]);
 
 export interface Token {

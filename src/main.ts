@@ -1,4 +1,5 @@
 import {parse} from './parse.ts';
+import {print} from './print.ts';
 import {TokenType, scan} from './scan.ts';
 
 export function run(source: string) {
@@ -9,8 +10,10 @@ export function run(source: string) {
     );
   }
   if (hadError) return;
-  console.log(parse(tokens));
-  // Run the code
+  const tree = parse(tokens);
+  console.log(tree);
+  if (hadError) return;
+  console.log(print(tree));
 }
 
 let hadError = false;
@@ -21,13 +24,15 @@ export function error(line: number, message: string) {
 
 if (import.meta.main) {
   run(`
-    theorem |foo runs|(x: natural) {
-      return x == 3;
+    function factorial(n: natural) {
+      print("Factorializing ~x0", n);
+      if (n == 0) {
+        return 1;
+      }
+      return n * factorial(n - 1);
     }
-
-    function foo() {
-      print("hello, world! ~x0", 3/4);
-      return true;
+    theorem |factorial > 0|(x: natural) {
+      return factorial(x) > 0;
     }
   `);
   //   run(`
