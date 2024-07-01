@@ -56,24 +56,22 @@ const KEYWORDS = new Map([
   ['reduce', TokenType.REDUCE],
 ]);
 
-interface Token {
+export interface Token {
   type: TokenType;
   lexeme: string;
-  literal: string | null;
   line: number;
 }
 
-export function scan(source: string) {
+export function scan(source: string): Token[] {
   const tokens: Token[] = [];
   let start = 0;
   let current = 0;
   let line = 1;
 
-  function addToken(type: TokenType, literal?: string) {
+  function addToken(type: TokenType) {
     tokens.push({
       type,
       lexeme: source.substring(start, current),
-      literal: literal ?? null,
       line,
     });
   }
@@ -168,7 +166,7 @@ export function scan(source: string) {
           error(line, 'Unterminated string.');
         }
         current++;
-        addToken(TokenType.STRING, source.substring(start + 1, current - 1));
+        addToken(TokenType.STRING);
         break;
       case '|':
         while (source.charAt(current) !== '|' && current < source.length) {
@@ -182,7 +180,7 @@ export function scan(source: string) {
           error(line, 'Unterminated identifier.');
         }
         current++;
-        addToken(TokenType.IDENTIFIER, source.substring(start, current));
+        addToken(TokenType.IDENTIFIER);
         break;
       case ' ':
       case '\r':
@@ -197,7 +195,13 @@ export function scan(source: string) {
           while (source.charAt(current).match(/[0-9]/)) {
             current++;
           }
-          addToken(TokenType.NUMBER, source.substring(start, current));
+          if (source.charAt(current) === '/') {
+            current++;
+            while (source.charAt(current).match(/[0-9]/)) {
+              current++;
+            }
+          }
+          addToken(TokenType.NUMBER);
           continue;
         }
         if (c.match(/[a-zA-Z_]/)) {
@@ -214,5 +218,5 @@ export function scan(source: string) {
         break;
     }
   }
-  return tokens;
+  return [...tokens, {type: TokenType.EOF, lexeme: '', line}];
 }
