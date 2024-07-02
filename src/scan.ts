@@ -62,6 +62,7 @@ export interface Token {
   type: TokenType;
   lexeme: string;
   line: number;
+  literal?: string;
 }
 
 export function scan(source: string): Token[] {
@@ -70,11 +71,12 @@ export function scan(source: string): Token[] {
   let current = 0;
   let line = 1;
 
-  function addToken(type: TokenType) {
+  function addToken(type: TokenType, literalMap = (x: string) => x) {
     tokens.push({
       type,
       lexeme: source.substring(start, current),
       line,
+      literal: literalMap(source.substring(start, current)),
     });
   }
 
@@ -194,16 +196,16 @@ export function scan(source: string): Token[] {
         break;
       default:
         if (c.match(/[0-9]/)) {
-          while (source.charAt(current).match(/[0-9]/)) {
+          while (source.charAt(current).match(/[0-9_]/)) {
             current++;
           }
           if (source.charAt(current) === '/') {
             current++;
-            while (source.charAt(current).match(/[0-9]/)) {
+            while (source.charAt(current).match(/[0-9_]/)) {
               current++;
             }
           }
-          addToken(TokenType.NUMBER);
+          addToken(TokenType.NUMBER, n => n.replaceAll(/_/g, ''));
           continue;
         }
         if (c.match(/[a-zA-Z_]/)) {
