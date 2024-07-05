@@ -21,11 +21,11 @@ theorem |is-palindrome works on odd palindromes|(l: list, x: any) {
 
 ## How to read this document
 
-- [I'm an ACL2 expert](#acl2-expert)
-- [I'm an experienced developer](#experienced-dev)
-- [I'm a total novice, but I'm here to learn](#novice)
+- [I'm an ACL2 expert](#background-for-acl2-experts)
+- [I'm an experienced developer](#more-details)
+- [I'm a total novice, but I'm here to learn](#basic-introduction)
 
-## Basic introduction {#novice}
+## Basic introduction
 
 Cogito is a small, simple, and expressive programming language that uses the [ACL2 theorem prover](https://www.cs.utexas.edu/~moore/acl2/) to execute functions and prove theorems. Its familiar C-like syntax enforces the constraints of ACL2 automatically.
 
@@ -39,11 +39,11 @@ Compared to writing raw ACL2, Cogito presents:
 
 The intent of Cogito is to be a gentle way to access ACL2's power, specifically through the lens of a teaching language for students unfamiliar with functional programming languages. Through its syntax, Cogito provides basic **guard rails** to make sure that the user is writing code that is more likely to succeed in proof attempts without as much cognitive overhead.
 
-## More details {#experienced-dev}
+## More details
 
 Cogito may superficially look like any other C-like language. But the extra constraints that the syntax enforces actually allow code to be interpreted by the sophisticated automatic ACL2 theorem prover, which can provide much more confidence in your code compared to unit tests.
 
-## Background for ACL2 experts {#acl2-expert}
+## Background for ACL2 experts
 
 ### Why not just write ACL2?
 
