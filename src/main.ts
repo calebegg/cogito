@@ -41,9 +41,9 @@ if (import.meta.main) {
       return nil;
     }
 
-    // function main() {
-    //   return pretty-print-point(new point(1/2, 3/2));
-    // }
+    function main() {
+      return pretty-print-point(new point(1/2, 3/2));
+    }
 
     function factorial(n: natural) {
       print("Factorializing ~x0", n);

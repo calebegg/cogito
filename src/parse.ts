@@ -3,36 +3,34 @@ import {error} from './main.ts';
 import {Token, TokenType} from './scan.ts';
 
 export enum NodeType {
-  PROGRAM,
-  THEOREM,
+  ASSERT,
+  ASSIGN,
   CONST,
-  STRUCT,
+  DOT_ACCESS,
+  EXPR,
+  FUNCTION_CALL,
   FUNCTION,
+  LIST_LITERAL,
+  MAIN,
   PARAMETER,
   PRINT,
-  ASSIGN,
-  EXPR,
-  TERMINAL_VALUE,
-  FUNCTION_CALL,
+  PROGRAM,
+  REDUCE,
   RETURN,
-  ASSERT,
+  SPREAD,
   STATEMENT,
-  DOT_ACCESS,
+  STRUCT,
+  TERMINAL_VALUE,
+  THEOREM,
 }
 
 export type Node =
   | Program
-  | Theorem
-  | Function
-  | Const
-  | Struct
+  | Declaration
   | Statement
+  | Statement['contents']
   | Parameter
-  | Print
-  | Assign
-  | Expr
-  | Return
-  | Assert;
+  | Expr;
 
 export interface NodeMixin<T extends NodeType> {
   type: T;
@@ -42,7 +40,11 @@ export interface Program extends NodeMixin<NodeType.PROGRAM> {
   declarations: Declaration[];
 }
 
-type Declaration = Function | Theorem | Const | Struct;
+type Declaration = Function | Theorem | Const | Struct | Main;
+
+interface Main extends NodeMixin<NodeType.MAIN> {
+  body: Statement;
+}
 
 interface Function extends NodeMixin<NodeType.FUNCTION> {
   name: string;
@@ -96,7 +98,13 @@ interface Assert extends NodeMixin<NodeType.ASSERT> {
   value: Expr;
 }
 
-type Expr = DotAccess | TerminalValue | FunctionCall;
+type Expr =
+  | DotAccess
+  | TerminalValue
+  | FunctionCall
+  | ListLiteral
+  | Spread
+  | Reduce;
 
 interface DotAccess extends NodeMixin<NodeType.DOT_ACCESS> {
   left: Expr;
@@ -112,6 +120,20 @@ interface FunctionCall extends NodeMixin<NodeType.FUNCTION_CALL> {
   args: Expr[];
 }
 
+interface ListLiteral extends NodeMixin<NodeType.LIST_LITERAL> {
+  contents: Expr[];
+}
+
+interface Spread extends NodeMixin<NodeType.SPREAD> {
+  value: Expr;
+}
+
+interface Reduce extends NodeMixin<NodeType.REDUCE> {
+  parameters: Parameter[];
+  body: Statement;
+}
+
+let hasMain = false;
 export function parse(tokens: Token[]) {
   let current = 0;
 
@@ -127,7 +149,7 @@ export function parse(tokens: Token[]) {
     };
   }
 
-  // declaration -> function | theorem | const | struct
+  // declaration -> function | theorem | const | struct | main
   function parseDeclaration(): Declaration {
     if (tokens[current].type === TokenType.FUNCTION) {
       return parseFunction();
@@ -137,12 +159,15 @@ export function parse(tokens: Token[]) {
       return parseConst();
     } else if (tokens[current].type === TokenType.STRUCT) {
       return parseStruct();
+    } else if (tokens[current].type === TokenType.MAIN) {
+      return parseMain();
     } else {
       throw error(
         tokens[current].line,
         outdent`
           Expected a declaration, got ${TokenType[tokens[current].type]}
-          Every top level expression must be a declaration.
+          Every top level expression must be a declaration. To have code
+          that executes at the top level, introduce a 'main' declaration.
         `.trim()
       );
     }
@@ -327,9 +352,41 @@ export function parse(tokens: Token[]) {
     };
   }
 
+  // assign -> IDENTIFIER '=' expr ';'
+  function parseAssign(): Assign {
+    // TODO: support foo.x as an lvalue
+    const name = expect(TokenType.IDENTIFIER).lexeme;
+    expect(TokenType.EQUAL);
+    const value = parseExpr();
+    expect(TokenType.SEMICOLON);
+    return {
+      type: NodeType.ASSIGN,
+      name,
+      value,
+    };
+  }
+
+  function parseMain(): Main {
+    if (hasMain) {
+      throw error(tokens[current].line, 'Only one main declaration is allowed');
+    }
+    hasMain = true;
+    expect(TokenType.MAIN);
+    expect(TokenType.LEFT_BRACE);
+    const body = parseStatement();
+    expect(TokenType.RIGHT_BRACE);
+    return {
+      type: NodeType.MAIN,
+      body,
+    };
+  }
+
   function parseExpressions() {
     const expressions: Expr[] = [];
-    while (tokens[current].type !== TokenType.RIGHT_PAREN) {
+    while (
+      tokens[current].type !== TokenType.RIGHT_PAREN &&
+      tokens[current].type !== TokenType.RIGHT_BRACKET
+    ) {
       expressions.push(parseExpr());
       if (tokens[current].type === TokenType.COMMA) {
         expect(TokenType.COMMA);
@@ -341,6 +398,75 @@ export function parse(tokens: Token[]) {
   }
 
   function parseExpr(level = 0): Expr {
+    // '(' expr ')'
+    if (tokens[current].type === TokenType.LEFT_PAREN) {
+      const inside = parseExpr();
+      expect(TokenType.RIGHT_PAREN);
+      return inside;
+    }
+    // '[' expr* ']'
+    if (tokens[current].type === TokenType.LEFT_BRACKET) {
+      const contents = parseExpressions();
+      expect(TokenType.RIGHT_BRACKET);
+      return {
+        type: NodeType.LIST_LITERAL,
+        contents,
+      };
+    }
+    // Reducers
+    if (tokens[current].type === TokenType.REDUCE) {
+      expect(TokenType.REDUCE);
+      expect(TokenType.LEFT_PAREN);
+      const parameters = parseParameters();
+      expect(TokenType.RIGHT_PAREN);
+      expect(TokenType.LEFT_BRACE);
+      const body = parseStatement();
+      expect(TokenType.RIGHT_BRACE);
+      return {
+        type: NodeType.REDUCE,
+        parameters,
+        body,
+      };
+    }
+    // Unary expressions
+    if (tokens[current].type === TokenType.BANG) {
+      expect(TokenType.BANG);
+      const right = parseExpr();
+      return {
+        type: NodeType.FUNCTION_CALL,
+        name: 'not',
+        args: [right],
+      };
+    }
+    if (tokens[current].type === TokenType.MINUS) {
+      expect(TokenType.MINUS);
+      const right = parseExpr();
+      return {
+        type: NodeType.FUNCTION_CALL,
+        name: '-',
+        args: [right],
+      };
+    }
+    if (tokens[current].type === TokenType.DOT_DOT_DOT) {
+      expect(TokenType.DOT_DOT_DOT);
+      const right = parseExpr();
+      return {
+        type: NodeType.SPREAD,
+        value: right,
+      };
+    }
+    if (tokens[current].type === TokenType.NEW) {
+      expect(TokenType.NEW);
+      const right = parseExpr();
+      if (right.type !== NodeType.FUNCTION_CALL) {
+        throw error(
+          tokens[current].line,
+          'New expressions must be function calls'
+        );
+      }
+      return right;
+    }
+    // Binary expressions
     switch (level) {
       case 0: {
         const left = parseExpr(level + 1);

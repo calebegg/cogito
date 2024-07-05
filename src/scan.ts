@@ -6,8 +6,11 @@ export enum TokenType {
   RIGHT_PAREN,
   LEFT_BRACE,
   RIGHT_BRACE,
+  LEFT_BRACKET,
+  RIGHT_BRACKET,
   COMMA,
   DOT,
+  DOT_DOT_DOT,
   MINUS,
   PLUS,
   SEMICOLON,
@@ -37,6 +40,8 @@ export enum TokenType {
   FALSE,
   FUNCTION,
   IF,
+  MAIN,
+  NEW,
   NIL,
   PRINT,
   REDUCE,
@@ -55,6 +60,8 @@ const KEYWORDS = new Map([
   ['false', TokenType.FALSE],
   ['function', TokenType.FUNCTION],
   ['if', TokenType.IF],
+  ['main', TokenType.MAIN],
+  ['new', TokenType.NEW],
   ['nil', TokenType.NIL],
   ['print', TokenType.PRINT],
   ['reduce', TokenType.REDUCE],
@@ -103,11 +110,14 @@ export function scan(source: string): Token[] {
       case '}':
         addToken(TokenType.RIGHT_BRACE);
         break;
+      case '[':
+        addToken(TokenType.LEFT_BRACE);
+        break;
+      case ']':
+        addToken(TokenType.RIGHT_BRACE);
+        break;
       case ',':
         addToken(TokenType.COMMA);
-        break;
-      case '.':
-        addToken(TokenType.DOT);
         break;
       case '-':
         addToken(TokenType.MINUS);
@@ -120,6 +130,20 @@ export function scan(source: string): Token[] {
         break;
       case ':':
         addToken(TokenType.COLON);
+        break;
+      case '.':
+        if (source.charAt(current) === '.') {
+          if (source.charAt(current + 1) !== '.') {
+            throw error(
+              line,
+              "'.' is an operator and '...' is an operator but '..' is not a thing"
+            );
+          }
+          current += 2;
+          addToken(TokenType.DOT_DOT_DOT);
+        } else {
+          addToken(TokenType.DOT);
+        }
         break;
       case '!':
         if (source.charAt(current) === '=') {

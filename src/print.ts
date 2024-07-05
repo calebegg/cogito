@@ -15,6 +15,8 @@ export function print(root: Node): string {
         ${progOut}
       `;
     }
+    case NodeType.MAIN:
+      return print(root.body);
     case NodeType.THEOREM:
       return `(defthm ${root.name})`;
     case NodeType.FUNCTION:
@@ -56,6 +58,11 @@ export function print(root: Node): string {
       return `(${root.name} ${root.args.map(a => print(a)).join(' ')})`;
     case NodeType.DOT_ACCESS:
       return `(assoc '${root.right} ${print(root.left)})`;
+    case NodeType.LIST_LITERAL:
+      // TODO: add spread
+      return `(append ${root.contents.map(c => `(list ${print(c)})`).join(' ')})`;
+    case NodeType.SPREAD:
+      return print(root.value);
     default:
       root satisfies never;
       throw new Error('Unreachable');
