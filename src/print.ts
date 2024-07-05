@@ -3,6 +3,7 @@ import {Node, NodeType, Parameter} from './parse.ts';
 import outdent from 'http://deno.land/x/outdent/mod.ts';
 
 const frontMatter: string[] = [];
+const structTypes: string[] = [];
 
 export function print(root: Node): string {
   switch (root.type) {
@@ -11,7 +12,7 @@ export function print(root: Node): string {
       return outdent`
         ${frontMatter.join('\n')}
 
-        ${progOut};
+        ${progOut}
       `;
     }
     case NodeType.THEOREM:
@@ -30,6 +31,7 @@ export function print(root: Node): string {
       return `(defconst ${root.name} ${print(root.value)})`;
     case NodeType.STRUCT:
       frontMatter.push('(include-book "std/util/defaggregate" :dir :system)');
+      structTypes.push(root.name);
       return outdent`
         (std::defaggregate ${root.name}
           (${root.parameters.map(f => `(${f.name} ${printTypeConstraint(f)})`).join(' ')}))`;
@@ -45,13 +47,15 @@ export function print(root: Node): string {
       return `(let ((${root.name} ${print(root.value)}))`;
     case NodeType.RETURN:
       return print(root.value);
-    case NodeType.LITERAL:
+    case NodeType.TERMINAL_VALUE:
       if (root.value === 'true') return 't';
       if (root.value === 'false') return 'nil';
       if (root.value === 'nil') return 'nil';
       return `${root.value}`;
     case NodeType.FUNCTION_CALL:
-      return `(${root.name} ${root.arguments.map(a => print(a)).join(' ')})`;
+      return `(${root.name} ${root.args.map(a => print(a)).join(' ')})`;
+    case NodeType.DOT_ACCESS:
+      return `(assoc '${root.right} ${print(root.left)})`;
     default:
       root satisfies never;
       throw new Error('Unreachable');
@@ -66,7 +70,15 @@ function printTypeConstraint(parameter: Parameter) {
       return `(stringp ${parameter.name})`;
     case 'list':
       return `(true-listp ${parameter.name})`;
+    case 'number':
+      return `(rationalp ${parameter.name})`;
     default:
-      throw error(parameter.line, `Unexpected type: ${parameter.paramType}`);
+      if (structTypes.includes(parameter.paramType)) {
+        return `(${parameter.paramType}-p ${parameter.name})`;
+      }
+      throw error(
+        parameter.line,
+        `Unknown parameter type ${parameter.paramType}`
+      );
   }
 }

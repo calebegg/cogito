@@ -1,3 +1,4 @@
+import outdent from 'https://deno.land/x/outdent@v0.8.0/mod.ts';
 import {error} from './main.ts';
 import {Token, TokenType} from './scan.ts';
 
@@ -11,11 +12,12 @@ export enum NodeType {
   PRINT,
   ASSIGN,
   EXPR,
-  LITERAL,
+  TERMINAL_VALUE,
   FUNCTION_CALL,
   RETURN,
   ASSERT,
   STATEMENT,
+  DOT_ACCESS,
 }
 
 export type Node =
@@ -94,15 +96,20 @@ interface Assert extends NodeMixin<NodeType.ASSERT> {
   value: Expr;
 }
 
-type Expr = Literal | FunctionCall;
+type Expr = DotAccess | TerminalValue | FunctionCall;
 
-interface Literal extends NodeMixin<NodeType.LITERAL> {
+interface DotAccess extends NodeMixin<NodeType.DOT_ACCESS> {
+  left: Expr;
+  right: string;
+}
+
+interface TerminalValue extends NodeMixin<NodeType.TERMINAL_VALUE> {
   value: string;
 }
 
 interface FunctionCall extends NodeMixin<NodeType.FUNCTION_CALL> {
   name: string;
-  arguments: Expr[];
+  args: Expr[];
 }
 
 export function parse(tokens: Token[]) {
@@ -133,7 +140,10 @@ export function parse(tokens: Token[]) {
     } else {
       throw error(
         tokens[current].line,
-        `Expected function or theorem, got ${TokenType[tokens[current].type]}`
+        outdent`
+          Expected a declaration, got ${TokenType[tokens[current].type]}
+          Every top level expression must be a declaration.
+        `.trim()
       );
     }
   }
@@ -259,13 +269,16 @@ export function parse(tokens: Token[]) {
           `Expected a statement but got ${TokenType[tokens[current].type]}`
         );
     }
+    let rest;
+    if (tokens[current].type === TokenType.RIGHT_BRACE) {
+      rest = null;
+    } else {
+      rest = parseStatement();
+    }
     return {
       type: NodeType.STATEMENT,
       contents,
-      rest:
-        tokens[current].type !== TokenType.RIGHT_BRACE
-          ? null
-          : parseStatement(),
+      rest,
     };
   }
 
@@ -327,18 +340,95 @@ export function parse(tokens: Token[]) {
     return expressions;
   }
 
-  function parseExpr(): Expr {
-    if (tokens[current].type === TokenType.IDENTIFIER) {
-      return {
-        type: NodeType.VARIABLE,
-        value: expect(TokenType.IDENTIFIER).lexeme,
-      };
-    } else {
-      return {
-        type: NodeType.LITERAL,
-        value: parseLiteral(),
-      };
+  function parseExpr(level = 0): Expr {
+    switch (level) {
+      case 0: {
+        const left = parseExpr(level + 1);
+        if (tokens[current].type === TokenType.DOT) {
+          expect(TokenType.DOT);
+          const right = expect(TokenType.IDENTIFIER).lexeme;
+          return {
+            type: NodeType.DOT_ACCESS,
+            left,
+            right,
+          };
+        }
+        return left;
+      }
+      case 1: {
+        const left = parseExpr(level + 1);
+        if ([TokenType.STAR, TokenType.SLASH].includes(tokens[current].type)) {
+          const op = tokens[current];
+          expect(op.type);
+          const right = parseExpr(level);
+          return {
+            type: NodeType.FUNCTION_CALL,
+            name: op.lexeme,
+            args: [left, right],
+          };
+        }
+        return left;
+      }
+      case 2: {
+        const left = parseExpr(level + 1);
+        if ([TokenType.PLUS, TokenType.MINUS].includes(tokens[current].type)) {
+          const op = tokens[current];
+          expect(op.type);
+          const right = parseExpr(level);
+          return {
+            type: NodeType.FUNCTION_CALL,
+            name: op.lexeme,
+            args: [left, right],
+          };
+        }
+        return left;
+      }
+      case 3: {
+        const left = parseExpr(level + 1);
+        if (
+          [
+            TokenType.GREATER,
+            TokenType.GREATER_EQUAL,
+            TokenType.LESS,
+            TokenType.LESS_EQUAL,
+          ].includes(tokens[current].type)
+        ) {
+          const op = tokens[current];
+          expect(op.type);
+          const right = parseExpr(level);
+          return {
+            type: NodeType.FUNCTION_CALL,
+            name: op.lexeme,
+            args: [left, right],
+          };
+        }
+        return left;
+      }
+      case 4:
+        if (tokens[current].type === TokenType.IDENTIFIER) {
+          const {lexeme} = expect(TokenType.IDENTIFIER);
+          if (tokens[current].type === TokenType.LEFT_PAREN) {
+            expect(TokenType.LEFT_PAREN);
+            const args = parseExpressions();
+            expect(TokenType.RIGHT_PAREN);
+            return {
+              type: NodeType.FUNCTION_CALL,
+              name: lexeme,
+              args,
+            };
+          }
+          return {
+            type: NodeType.TERMINAL_VALUE,
+            value: lexeme,
+          };
+        } else {
+          return {
+            type: NodeType.TERMINAL_VALUE,
+            value: parseLiteral(),
+          };
+        }
     }
+    throw new Error('Unreachable code');
   }
 
   function parseLiteral() {

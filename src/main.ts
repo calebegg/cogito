@@ -2,7 +2,10 @@ import {parse} from './parse.ts';
 import {print} from './print.ts';
 import {TokenType, scan} from './scan.ts';
 
+let sourceCopy: string;
+
 export function run(source: string) {
+  sourceCopy = source;
   const tokens = scan(source);
   for (const token of tokens) {
     console.log(
@@ -19,7 +22,9 @@ export function run(source: string) {
 let hadError = false;
 export function error(line: number, message: string) {
   hadError = true;
-  return new Error(`[line ${line}]: ${message}`);
+  return new Error(
+    `[line ${line}]: ${message}\n` + sourceCopy.split('\n')[line - 1]
+  );
 }
 
 if (import.meta.main) {
@@ -33,15 +38,18 @@ if (import.meta.main) {
 
     function pretty-print-point (p: point) {
       print("[Point x=~x0 y=~x1]", p.x, p.y);
+      return nil;
     }
 
-    pretty-print-point(new point(x = 1/2, y = 3/2))
+    // function main() {
+    //   return pretty-print-point(new point(1/2, 3/2));
+    // }
 
     function factorial(n: natural) {
       print("Factorializing ~x0", n);
-      if (n == 0) {
-        return 1;
-      }
+      // if (n == 0) {
+      //   return 1;
+      // }
       return n * factorial(n - 1);
     }
     theorem |factorial > 0|(x: natural) {
