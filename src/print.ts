@@ -2,30 +2,46 @@ import {error} from './main.ts';
 import {Node, NodeType, Parameter} from './parse.ts';
 import outdent from 'http://deno.land/x/outdent/mod.ts';
 
-let indentLevel = 0;
+const frontMatter: string[] = [];
 
 export function print(root: Node): string {
   switch (root.type) {
-    case NodeType.PROGRAM:
-      return root.declarations.map(d => print(d)).join('\n\n');
+    case NodeType.PROGRAM: {
+      const progOut = root.declarations.map(d => print(d)).join('\n\n');
+      return outdent`
+        ${frontMatter.join('\n')}
+
+        ${progOut};
+      `;
+    }
     case NodeType.THEOREM:
       return `(defthm ${root.name})`;
     case NodeType.FUNCTION:
-      indentLevel = 2;
+      // Returning 0 is...weird, but 'nil' fails (acl2-numberp return-value)
+      // and so fails most measures.
       return outdent`
         (defun ${root.name} (${root.parameters.map(p => print(p)).join(' ')})
           (declare (xargs :guard (and ${root.parameters.map(p => printTypeConstraint(p)).join(' ')})))
           (if (not (and ${root.parameters.map(p => printTypeConstraint(p)).join(' ')}))
-            nil
-            ${root.body.map(b => print(b)).join('\n')}${')'.repeat(indentLevel)}
+            0
+            ${print(root.body)}))
         `;
+    case NodeType.CONST:
+      return `(defconst ${root.name} ${print(root.value)})`;
+    case NodeType.STRUCT:
+      frontMatter.push('(include-book "std/util/defaggregate" :dir :system)');
+      return outdent`
+        (std::defaggregate ${root.name}
+          (${root.parameters.map(f => `(${f.name} ${printTypeConstraint(f)})`).join(' ')}))`;
     case NodeType.PARAMETER:
       return root.name;
+    case NodeType.STATEMENT:
+      return print(root.contents) + (root.rest ? `\n${print(root.rest)})` : '');
     case NodeType.PRINT:
-      indentLevel++;
       return `(prog2$ (cw ${root.template.substring(0, root.template.length - 1)}~%" ${root.expressions.map(e => print(e)).join(' ')})`;
+    case NodeType.ASSERT:
+      return `(assert$ ${print(root.value)})`;
     case NodeType.ASSIGN:
-      indentLevel++;
       return `(let ((${root.name} ${print(root.value)}))`;
     case NodeType.RETURN:
       return print(root.value);

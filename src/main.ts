@@ -24,6 +24,19 @@ export function error(line: number, message: string) {
 
 if (import.meta.main) {
   run(`
+    const *eight* = 8;
+
+    struct point(
+      x: number,
+      y: number,
+    );
+
+    function pretty-print-point (p: point) {
+      print("[Point x=~x0 y=~x1]", p.x, p.y);
+    }
+
+    pretty-print-point(new point(x = 1/2, y = 3/2))
+
     function factorial(n: natural) {
       print("Factorializing ~x0", n);
       if (n == 0) {

@@ -31,31 +31,37 @@ export enum TokenType {
   NUMBER,
 
   // Keywords
-  FUNCTION,
-  THEOREM,
-  IF,
+  ASSERT,
+  CONST,
   ELSE,
-  TRUE,
   FALSE,
+  FUNCTION,
+  IF,
   NIL,
-  RETURN,
-  REDUCE,
   PRINT,
+  REDUCE,
+  RETURN,
+  STRUCT,
+  THEOREM,
+  TRUE,
 
   EOF,
 }
 
 const KEYWORDS = new Map([
-  ['function', TokenType.FUNCTION],
-  ['theorem', TokenType.THEOREM],
-  ['if', TokenType.IF],
+  ['assert', TokenType.ASSERT],
+  ['const', TokenType.CONST],
   ['else', TokenType.ELSE],
-  ['true', TokenType.TRUE],
   ['false', TokenType.FALSE],
+  ['function', TokenType.FUNCTION],
+  ['if', TokenType.IF],
   ['nil', TokenType.NIL],
-  ['return', TokenType.RETURN],
-  ['reduce', TokenType.REDUCE],
   ['print', TokenType.PRINT],
+  ['reduce', TokenType.REDUCE],
+  ['return', TokenType.RETURN],
+  ['struct', TokenType.STRUCT],
+  ['theorem', TokenType.THEOREM],
+  ['true', TokenType.TRUE],
 ]);
 
 export interface Token {
@@ -114,9 +120,6 @@ export function scan(source: string): Token[] {
         break;
       case ':':
         addToken(TokenType.COLON);
-        break;
-      case '*':
-        addToken(TokenType.STAR);
         break;
       case '!':
         if (source.charAt(current) === '=') {
@@ -208,8 +211,12 @@ export function scan(source: string): Token[] {
           addToken(TokenType.NUMBER, n => n.replaceAll(/_/g, ''));
           continue;
         }
-        if (c.match(/[a-zA-Z_]/)) {
-          while (source.charAt(current).match(/[a-zA-Z0-9_-]/)) {
+        if (c.match(/[a-zA-Z_*]/)) {
+          if (c === '*' && !source.charAt(current).match(/[a-zA-Z0-9_-]/)) {
+            addToken(TokenType.STAR);
+            continue;
+          }
+          while (source.charAt(current).match(/[a-zA-Z0-9_*-]/)) {
             current++;
           }
           addToken(

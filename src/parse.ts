@@ -4,6 +4,8 @@ import {Token, TokenType} from './scan.ts';
 export enum NodeType {
   PROGRAM,
   THEOREM,
+  CONST,
+  STRUCT,
   FUNCTION,
   PARAMETER,
   PRINT,
@@ -12,17 +14,23 @@ export enum NodeType {
   LITERAL,
   FUNCTION_CALL,
   RETURN,
+  ASSERT,
+  STATEMENT,
 }
 
 export type Node =
   | Program
   | Theorem
   | Function
+  | Const
+  | Struct
+  | Statement
   | Parameter
   | Print
   | Assign
   | Expr
-  | Return;
+  | Return
+  | Assert;
 
 export interface NodeMixin<T extends NodeType> {
   type: T;
@@ -32,20 +40,29 @@ export interface Program extends NodeMixin<NodeType.PROGRAM> {
   declarations: Declaration[];
 }
 
-// TODO: change to type alias
-type Declaration = Function | Theorem;
+type Declaration = Function | Theorem | Const | Struct;
 
 interface Function extends NodeMixin<NodeType.FUNCTION> {
   name: string;
   parameters: Parameter[];
-  body: Statement[];
+  body: Statement;
 }
 
 interface Theorem extends NodeMixin<NodeType.THEOREM> {
   name: string;
   parameters: Parameter[];
   // What happens if you do `cw` in a theorem??
-  body: Statement[];
+  body: Statement;
+}
+
+interface Const extends NodeMixin<NodeType.CONST> {
+  name: string;
+  value: Expr;
+}
+
+interface Struct extends NodeMixin<NodeType.STRUCT> {
+  name: string;
+  parameters: Parameter[];
 }
 
 export interface Parameter extends NodeMixin<NodeType.PARAMETER> {
@@ -54,7 +71,10 @@ export interface Parameter extends NodeMixin<NodeType.PARAMETER> {
   paramType: string;
 }
 
-type Statement = Print | Assign;
+interface Statement extends NodeMixin<NodeType.STATEMENT> {
+  contents: Print | Assign | Assert | Return;
+  rest: Statement | null;
+}
 
 interface Print extends NodeMixin<NodeType.PRINT> {
   template: string;
@@ -67,6 +87,10 @@ interface Return extends NodeMixin<NodeType.RETURN> {
 
 interface Assign extends NodeMixin<NodeType.ASSIGN> {
   name: string;
+  value: Expr;
+}
+
+interface Assert extends NodeMixin<NodeType.ASSERT> {
   value: Expr;
 }
 
@@ -96,12 +120,16 @@ export function parse(tokens: Token[]) {
     };
   }
 
-  // declaration -> function | theorem
+  // declaration -> function | theorem | const | struct
   function parseDeclaration(): Declaration {
     if (tokens[current].type === TokenType.FUNCTION) {
       return parseFunction();
     } else if (tokens[current].type === TokenType.THEOREM) {
       return parseTheorem();
+    } else if (tokens[current].type === TokenType.CONST) {
+      return parseConst();
+    } else if (tokens[current].type === TokenType.STRUCT) {
+      return parseStruct();
     } else {
       throw error(
         tokens[current].line,
@@ -118,7 +146,7 @@ export function parse(tokens: Token[]) {
     const parameters = parseParameters();
     expect(TokenType.RIGHT_PAREN);
     expect(TokenType.LEFT_BRACE);
-    const body = parseBody();
+    const body = parseStatement();
     expect(TokenType.RIGHT_BRACE);
     return {
       type: NodeType.FUNCTION,
@@ -136,7 +164,7 @@ export function parse(tokens: Token[]) {
     const parameters = parseParameters();
     expect(TokenType.RIGHT_PAREN);
     expect(TokenType.LEFT_BRACE);
-    const body = parseBody();
+    const body = parseStatement();
     expect(TokenType.RIGHT_BRACE);
     return {
       type: NodeType.THEOREM,
@@ -146,10 +174,45 @@ export function parse(tokens: Token[]) {
     };
   }
 
+  // const -> 'const' IDENTIFIER '=' expr ';'
+  function parseConst(): Const {
+    expect(TokenType.CONST);
+    const name = expect(TokenType.IDENTIFIER).lexeme;
+    if (!name.startsWith('*') && !name.endsWith('*')) {
+      throw error(
+        tokens[current].line,
+        `Const names must begin and end with '*', *like-this*, got ${name} instead`
+      );
+    }
+    expect(TokenType.EQUAL);
+    const value = parseExpr();
+    expect(TokenType.SEMICOLON);
+    return {
+      type: NodeType.CONST,
+      name,
+      value,
+    };
+  }
+
+  function parseStruct(): Struct {
+    expect(TokenType.STRUCT);
+    const name = expect(TokenType.IDENTIFIER).lexeme;
+    expect(TokenType.LEFT_PAREN);
+    const parameters = parseParameters();
+    expect(TokenType.RIGHT_PAREN);
+    expect(TokenType.SEMICOLON);
+    return {
+      type: NodeType.STRUCT,
+      name,
+      parameters,
+    };
+  }
+
   function parseParameters() {
     const parameters: Parameter[] = [];
     if (tokens[current].type != TokenType.RIGHT_PAREN) {
       while (true) {
+        if (tokens[current].type == TokenType.RIGHT_PAREN) break;
         parameters.push(parseParameter());
         if (tokens[current].type === TokenType.COMMA) {
           expect(TokenType.COMMA);
@@ -174,28 +237,36 @@ export function parse(tokens: Token[]) {
     return expect(TokenType.IDENTIFIER).lexeme;
   }
 
-  function parseBody(): Statement[] {
-    const statements: Statement[] = [];
-    while (tokens[current].type !== TokenType.RIGHT_BRACE) {
-      statements.push(parseStatement());
-    }
-    return statements;
-  }
-
   // statement -> print | assign | return
   function parseStatement(): Statement {
-    if (tokens[current].type === TokenType.PRINT) {
-      return parsePrint();
-    } else if (tokens[current].type === TokenType.IDENTIFIER) {
-      return parseAssign();
-    } else if (tokens[current].type === TokenType.RETURN) {
-      return parseReturn();
-    } else {
-      throw error(
-        tokens[current].line,
-        `Expected print, assign, or return, got ${TokenType[tokens[current].type]}`
-      );
+    let contents: Statement['contents'];
+    switch (tokens[current].type) {
+      case TokenType.PRINT:
+        contents = parsePrint();
+        break;
+      case TokenType.ASSERT:
+        contents = parseAssert();
+        break;
+      case TokenType.IDENTIFIER:
+        contents = parseAssign();
+        break;
+      case TokenType.RETURN:
+        contents = parseReturn();
+        break;
+      default:
+        throw error(
+          tokens[current].line,
+          `Expected a statement but got ${TokenType[tokens[current].type]}`
+        );
     }
+    return {
+      type: NodeType.STATEMENT,
+      contents,
+      rest:
+        tokens[current].type !== TokenType.RIGHT_BRACE
+          ? null
+          : parseStatement(),
+    };
   }
 
   // print -> 'print' '(' template expr* ')' ';'
@@ -216,6 +287,19 @@ export function parse(tokens: Token[]) {
       type: NodeType.PRINT,
       template,
       expressions,
+    };
+  }
+
+  // assert -> 'assert' '(' expr ')' ';'
+  function parseAssert(): Assert {
+    expect(TokenType.ASSERT);
+    expect(TokenType.LEFT_PAREN);
+    const value = parseExpr();
+    expect(TokenType.RIGHT_PAREN);
+    expect(TokenType.SEMICOLON);
+    return {
+      type: NodeType.ASSERT,
+      value,
     };
   }
 

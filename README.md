@@ -1,69 +1,62 @@
 # Achilles (working title)
 
-An example is the best way to introduce a language, so here's an example:
-
 ```
-function fib(n: natural) {
-  if (n == 0) return 0;
-  if (n == 1) return 1;
-  return fib(n - 1) + fib(n - 2);
+function is-palindrome(l: list) {
+  reversed = reverse(l);
+  print("Original list: ~x0", l);
+  print("Reversed list: ~x0", reversed);
+  return l == reversed;
 }
 
-function fib-tail(n: natural, a: natural, b: natural) {
-  if (n == 0) return a;
-  if (n == 1) return b;
-  return fib-tail(n - 1, b, a + b);
+theorem |is-palindrome is equivalent on a reversal|(l: list) {
+  return is-palindrome(reverse(l)) == is-palindrome(l);
 }
-
-function fib-fast(n) {
-  return fib-tail(n, 0, 1);
+theorem |is-palindrome works on even palindromes|(l: list) {
+  return is-palindrome([...l, ...reverse(l)]);
 }
-
-theorem |fib-fast == fib|(x: natural) {
-  return fib-fast(x) == fib(x);
+theorem |is-palindrome works on odd palindromes|(l: list, x: any) {
+  return is-palindrome([...l, x, ...reverse(l)]);
 }
 ```
 
-Achilles is a little language that uses the [ACL2 theorem prover](https://www.cs.utexas.edu/~moore/acl2/) to execute functions and prove theorems. Its familiar C-like syntax enforces the constraints of ACL2 automatically.
+Achilles is a simple programming language that uses the [ACL2 theorem prover](https://www.cs.utexas.edu/~moore/acl2/) to execute functions and prove theorems. Its familiar C-like syntax enforces the constraints of ACL2 automatically.
 
 Compared to writing raw ACL2, Achilles presents:
 
 - A C-like syntax that's more familiar to most programmers
 - A straightforward way to print debugging information
-- The ability to define aliases without deep nesting
-- Parameter types for functions and theorems that set up total functions and sane theorems without effort
+- The ability to easily define aliases without deep nesting
+- Parameter types for functions and theorems that set up total functions and sane theorems without extra effort
 - Syntactic sugar for common list operations like `map`, `flatMap`, `reduce`, `filter`, and `zipWith`
 
-## Appendix A: ACL2 output for above example
+The intent of Achilles is to be a gentle way to access ACL2's power, specifically through the lens of a teaching language for students unfamiliar with functional programming languages. Achilles supplies **guard rails** to make sure that the user is writing code that is more likely to succeed in proof attempts without as much cognitive overhead.
+
+## Examples
+
+
+
+## Appendix: ACL2 code output for above example
 
 ```lisp
-(defun fib (n)
-  (if (not (and (natp n)))
-      nil
-      (if (= n 0)
-          0
-          (if (= n 1)
-              1
-              (+ (fib (- n 1)) (fib (- n 2)))))))
+(defun is-palindrome (l)
+  (declare (xargs :guard (and (true-listp l))))
+  (if (not (and (true-listp l)))
+      0
+      (let ((reversed (reverse l)))
+           (prog2$ (cw "Original list: ~x0~%" l)
+                   (prog2$ (cw "Reversed list: ~x0~%" reversed)
+                           (equal l reversed))))))
 
-(defun fib-tail (n a b)
-  (if (not (and (natp n) (natp a) (natp b)))
-      nil
-      (if (= n 0)
-          a
-          (if (= n 1)
-              b
-              (fib-tail (- n 1) b (+ a b))))))
-
-(defun fib-fast (n)
-  (if (not (and (natp n))
-      nil
-      (fib-tail n 0 1))))
-
-(defthm |fib-fast == fib|
-  (implies (and (natp x))
-    (= (fib-fast x) (fib x))))
-
+(defthm |is-palindrome is equivalent on a reversal|
+  (implies (true-listp l)
+           (equal (is-palindrome (reverse l))
+                  (is-palindrome l))))
+(defthm |is-palindrome works on even palindromes|
+  (implies (true-listp l)
+           (is-palindrome (append l (reverse l)))))
+(defthm |is-palindrome works on odd palindromes|
+  (implies (true-listp l)
+           (is-palindrome (append l (list x) (reverse l)))))
 ```
 
 This is not an officially supported Google product
