@@ -1,33 +1,34 @@
-import {assertEquals} from 'https://deno.land/std@0.207.0/assert/mod.ts';
 import {scan} from './scan.ts';
 import outdent from 'https://deno.land/x/outdent@v0.8.0/mod.ts';
 import {parse} from './parse.ts';
 import {print} from './print.ts';
+import {assertSnapshot} from 'https://deno.land/std@0.224.0/testing/snapshot.ts';
 
-function clean(s: string) {
-  return s.replaceAll(/\s/g, ' ').trim;
-}
+Deno.test('parse a basic program', async t => {
+  await assertSnapshot(
+    t,
+    print(
+      parse(
+        scan(
+          outdent`
+        function foo(x: number) {
+          return 1;
+        }
 
-Deno.test('print a basic function', () => {
-  assertEquals(
-    clean(
-      print(
-        parse(
-          scan(
-            outdent`
-              function foo(x: number) {
-                return 1;
-              }
-            `
-          )
+        theorem |foo works|(x: number) {
+          return foo(x) > 0;
+        }
+
+        const *foo* = 1;
+
+        struct foo(x: number, y: number);
+
+        main {
+          print("hello, world!");
+        }
+      `
         )
       )
-    ),
-    clean(`
-    (defun foo (x)
-         (declare (xargs :guard (and (rationalp x))))
-         (if (not (and (rationalp x)))
-           0
-           1)`)
+    )
   );
 });

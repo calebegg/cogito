@@ -1,0 +1,523 @@
+export const snapshot = {};
+
+snapshot[`scan a basic function 1`] = `
+[
+  {
+    lexeme: "function",
+    line: 1,
+    literal: "function",
+    type: 30,
+  },
+  {
+    lexeme: "foo",
+    line: 1,
+    literal: "foo",
+    type: 23,
+  },
+  {
+    lexeme: "(",
+    line: 1,
+    literal: "(",
+    type: 0,
+  },
+  {
+    lexeme: "x",
+    line: 1,
+    literal: "x",
+    type: 23,
+  },
+  {
+    lexeme: ":",
+    line: 1,
+    literal: ":",
+    type: 12,
+  },
+  {
+    lexeme: "number",
+    line: 1,
+    literal: "number",
+    type: 23,
+  },
+  {
+    lexeme: ")",
+    line: 1,
+    literal: ")",
+    type: 1,
+  },
+  {
+    lexeme: "{",
+    line: 1,
+    literal: "{",
+    type: 2,
+  },
+  {
+    lexeme: "return",
+    line: 2,
+    literal: "return",
+    type: 37,
+  },
+  {
+    lexeme: "1",
+    line: 2,
+    literal: "1",
+    type: 25,
+  },
+  {
+    lexeme: ";",
+    line: 2,
+    literal: ";",
+    type: 11,
+  },
+  {
+    lexeme: "}",
+    line: 3,
+    literal: "}",
+    type: 3,
+  },
+  {
+    lexeme: "",
+    line: 3,
+    type: 41,
+  },
+]
+`;
+
+snapshot[`scan a basic theorem 1`] = `
+[
+  {
+    lexeme: "theorem",
+    line: 1,
+    literal: "theorem",
+    type: 39,
+  },
+  {
+    lexeme: "|foo works|",
+    line: 1,
+    literal: "|foo works|",
+    type: 23,
+  },
+  {
+    lexeme: "(",
+    line: 1,
+    literal: "(",
+    type: 0,
+  },
+  {
+    lexeme: "x",
+    line: 1,
+    literal: "x",
+    type: 23,
+  },
+  {
+    lexeme: ":",
+    line: 1,
+    literal: ":",
+    type: 12,
+  },
+  {
+    lexeme: "number",
+    line: 1,
+    literal: "number",
+    type: 23,
+  },
+  {
+    lexeme: ")",
+    line: 1,
+    literal: ")",
+    type: 1,
+  },
+  {
+    lexeme: "{",
+    line: 1,
+    literal: "{",
+    type: 2,
+  },
+  {
+    lexeme: "return",
+    line: 2,
+    literal: "return",
+    type: 37,
+  },
+  {
+    lexeme: "foo",
+    line: 2,
+    literal: "foo",
+    type: 23,
+  },
+  {
+    lexeme: "(",
+    line: 2,
+    literal: "(",
+    type: 0,
+  },
+  {
+    lexeme: "x",
+    line: 2,
+    literal: "x",
+    type: 23,
+  },
+  {
+    lexeme: ")",
+    line: 2,
+    literal: ")",
+    type: 1,
+  },
+  {
+    lexeme: ">",
+    line: 2,
+    literal: ">",
+    type: 19,
+  },
+  {
+    lexeme: "0",
+    line: 2,
+    literal: "0",
+    type: 25,
+  },
+  {
+    lexeme: "}",
+    line: 3,
+    literal: "}",
+    type: 3,
+  },
+  {
+    lexeme: "",
+    line: 3,
+    type: 41,
+  },
+]
+`;
+
+snapshot[`scan a basic main 1`] = `
+[
+  {
+    lexeme: "main",
+    line: 1,
+    literal: "main",
+    type: 32,
+  },
+  {
+    lexeme: "{",
+    line: 1,
+    literal: "{",
+    type: 2,
+  },
+  {
+    lexeme: "print",
+    line: 2,
+    literal: "print",
+    type: 35,
+  },
+  {
+    lexeme: "(",
+    line: 2,
+    literal: "(",
+    type: 0,
+  },
+  {
+    lexeme: '"hello, world!"',
+    line: 2,
+    literal: '"hello, world!"',
+    type: 24,
+  },
+  {
+    lexeme: ")",
+    line: 2,
+    literal: ")",
+    type: 1,
+  },
+  {
+    lexeme: ";",
+    line: 2,
+    literal: ";",
+    type: 11,
+  },
+  {
+    lexeme: "}",
+    line: 3,
+    literal: "}",
+    type: 3,
+  },
+  {
+    lexeme: "",
+    line: 3,
+    type: 41,
+  },
+]
+`;
+
+snapshot[`scan a basic const 1`] = `
+[
+  {
+    lexeme: "const",
+    line: 1,
+    literal: "const",
+    type: 27,
+  },
+  {
+    lexeme: "*foo*",
+    line: 1,
+    literal: "*foo*",
+    type: 23,
+  },
+  {
+    lexeme: "=",
+    line: 1,
+    literal: "=",
+    type: 17,
+  },
+  {
+    lexeme: "1",
+    line: 1,
+    literal: "1",
+    type: 25,
+  },
+  {
+    lexeme: ";",
+    line: 1,
+    literal: ";",
+    type: 11,
+  },
+  {
+    lexeme: "",
+    line: 1,
+    type: 41,
+  },
+]
+`;
+
+snapshot[`scan a basic struct 1`] = `
+[
+  {
+    lexeme: "struct",
+    line: 1,
+    literal: "struct",
+    type: 38,
+  },
+  {
+    lexeme: "foo",
+    line: 1,
+    literal: "foo",
+    type: 23,
+  },
+  {
+    lexeme: "(",
+    line: 1,
+    literal: "(",
+    type: 0,
+  },
+  {
+    lexeme: "x",
+    line: 1,
+    literal: "x",
+    type: 23,
+  },
+  {
+    lexeme: ":",
+    line: 1,
+    literal: ":",
+    type: 12,
+  },
+  {
+    lexeme: "number",
+    line: 1,
+    literal: "number",
+    type: 23,
+  },
+  {
+    lexeme: ",",
+    line: 1,
+    literal: ",",
+    type: 6,
+  },
+  {
+    lexeme: "y",
+    line: 1,
+    literal: "y",
+    type: 23,
+  },
+  {
+    lexeme: ":",
+    line: 1,
+    literal: ":",
+    type: 12,
+  },
+  {
+    lexeme: "number",
+    line: 1,
+    literal: "number",
+    type: 23,
+  },
+  {
+    lexeme: ")",
+    line: 1,
+    literal: ")",
+    type: 1,
+  },
+  {
+    lexeme: ";",
+    line: 1,
+    literal: ";",
+    type: 11,
+  },
+  {
+    lexeme: "",
+    line: 1,
+    type: 41,
+  },
+]
+`;
+
+snapshot[`scan a basic assert 1`] = `
+[
+  {
+    lexeme: "assert",
+    line: 1,
+    literal: "assert",
+    type: 26,
+  },
+  {
+    lexeme: "(",
+    line: 1,
+    literal: "(",
+    type: 0,
+  },
+  {
+    lexeme: "x",
+    line: 1,
+    literal: "x",
+    type: 23,
+  },
+  {
+    lexeme: ">",
+    line: 1,
+    literal: ">",
+    type: 19,
+  },
+  {
+    lexeme: "0",
+    line: 1,
+    literal: "0",
+    type: 25,
+  },
+  {
+    lexeme: ")",
+    line: 1,
+    literal: ")",
+    type: 1,
+  },
+  {
+    lexeme: ";",
+    line: 1,
+    literal: ";",
+    type: 11,
+  },
+  {
+    lexeme: "",
+    line: 1,
+    type: 41,
+  },
+]
+`;
+
+snapshot[`scan a basic print 1`] = `
+[
+  {
+    lexeme: "print",
+    line: 1,
+    literal: "print",
+    type: 35,
+  },
+  {
+    lexeme: "(",
+    line: 1,
+    literal: "(",
+    type: 0,
+  },
+  {
+    lexeme: '"hello, world!"',
+    line: 1,
+    literal: '"hello, world!"',
+    type: 24,
+  },
+  {
+    lexeme: ")",
+    line: 1,
+    literal: ")",
+    type: 1,
+  },
+  {
+    lexeme: ";",
+    line: 1,
+    literal: ";",
+    type: 11,
+  },
+  {
+    lexeme: "",
+    line: 1,
+    type: 41,
+  },
+]
+`;
+
+snapshot[`scan a basic return 1`] = `
+[
+  {
+    lexeme: "return",
+    line: 1,
+    literal: "return",
+    type: 37,
+  },
+  {
+    lexeme: "1",
+    line: 1,
+    literal: "1",
+    type: 25,
+  },
+  {
+    lexeme: ";",
+    line: 1,
+    literal: ";",
+    type: 11,
+  },
+  {
+    lexeme: "",
+    line: 1,
+    type: 41,
+  },
+]
+`;
+
+snapshot[`scan a basic assign 1`] = `
+[
+  {
+    lexeme: "x",
+    line: 1,
+    literal: "x",
+    type: 23,
+  },
+  {
+    lexeme: "=",
+    line: 1,
+    literal: "=",
+    type: 17,
+  },
+  {
+    lexeme: "1",
+    line: 1,
+    literal: "1",
+    type: 25,
+  },
+  {
+    lexeme: ";",
+    line: 1,
+    literal: ";",
+    type: 11,
+  },
+  {
+    lexeme: "",
+    line: 1,
+    type: 41,
+  },
+]
+`;

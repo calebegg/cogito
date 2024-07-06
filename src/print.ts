@@ -8,6 +8,8 @@ const structTypes: string[] = [];
 
 const FUNCTION_NAMES = new Map([['==', 'equal']]);
 
+let parentDeclarationType: NodeType;
+
 export function print(root: Node): string {
   switch (root.type) {
     case NodeType.PROGRAM: {
@@ -19,13 +21,16 @@ export function print(root: Node): string {
       `;
     }
     case NodeType.MAIN:
+      parentDeclarationType = root.type;
       return print(root.body);
     case NodeType.THEOREM:
+      parentDeclarationType = root.type;
       return outdent`
         (defthm ${root.name}
             (implies (and ${root.parameters.map(p => printTypeConstraint(p)).join(' ')})
                 ${print(root.body)}))`;
     case NodeType.FUNCTION:
+      parentDeclarationType = root.type;
       // Returning 0 is...weird, but 'nil' fails (acl2-numberp return-value)
       // and so fails most measures.
       return outdent`
@@ -36,8 +41,10 @@ export function print(root: Node): string {
             ${print(root.body)}))
         `;
     case NodeType.CONST:
+      parentDeclarationType = root.type;
       return `(defconst ${root.name} ${print(root.value)})`;
     case NodeType.STRUCT:
+      parentDeclarationType = root.type;
       frontMatter.push('(include-book "std/util/defaggregate" :dir :system)');
       structTypes.push(root.name);
       return outdent`
@@ -49,7 +56,15 @@ export function print(root: Node): string {
       if (root.contents.type === NodeType.IF) {
         return printIf(root.contents, root.rest);
       }
-      return print(root.contents) + (root.rest ? `\n${print(root.rest)})` : '');
+      let rest = root.rest ? `\n${print(root.rest)})` : '';
+      if (
+        parentDeclarationType == NodeType.MAIN &&
+        !root.rest &&
+        root.contents.type !== NodeType.RETURN
+      ) {
+        rest = ' nil)';
+      }
+      return print(root.contents) + rest;
     }
     case NodeType.PRINT:
       return `(prog2$ (cw ${root.template.substring(0, root.template.length - 1)}~%" ${root.expressions.map(e => print(e)).join(' ')})`;

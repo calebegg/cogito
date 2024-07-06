@@ -1,0 +1,109 @@
+export const snapshot = {};
+
+snapshot[`parse a basic program 1`] = `
+{
+  declarations: [
+    {
+      body: {
+        contents: {
+          type: 14,
+          value: {
+            type: 18,
+            value: "1",
+          },
+        },
+        rest: null,
+        type: 16,
+      },
+      name: "foo",
+      parameters: [
+        {
+          line: 1,
+          name: "x",
+          paramType: "number",
+          type: 10,
+        },
+      ],
+      type: 6,
+    },
+    {
+      body: {
+        contents: {
+          type: 14,
+          value: {
+            args: [
+              {
+                args: [
+                  {
+                    type: 18,
+                    value: "x",
+                  },
+                ],
+                name: "foo",
+                type: 5,
+              },
+              {
+                type: 18,
+                value: "0",
+              },
+            ],
+            name: ">",
+            type: 5,
+          },
+        },
+        rest: null,
+        type: 16,
+      },
+      name: "|foo works|",
+      parameters: [
+        {
+          line: 5,
+          name: "x",
+          paramType: "number",
+          type: 10,
+        },
+      ],
+      type: 19,
+    },
+    {
+      name: "*foo*",
+      type: 2,
+      value: {
+        type: 18,
+        value: "1",
+      },
+    },
+    {
+      name: "foo",
+      parameters: [
+        {
+          line: 11,
+          name: "x",
+          paramType: "number",
+          type: 10,
+        },
+        {
+          line: 11,
+          name: "y",
+          paramType: "number",
+          type: 10,
+        },
+      ],
+      type: 17,
+    },
+    {
+      body: {
+        contents: {
+          expressions: [],
+          template: '"hello, world!"',
+          type: 11,
+        },
+        rest: null,
+        type: 16,
+      },
+      type: 9,
+    },
+  ],
+  type: 12,
+}
+`;

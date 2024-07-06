@@ -1,0 +1,22 @@
+export const snapshot = {};
+
+snapshot[`parse a basic program 1`] = `
+'(include-book "std/util/defaggregate" :dir :system)
+
+(defun foo (x)
+  (declare (xargs :guard (and (rationalp x))))
+  (if (not (and (rationalp x)))
+    0
+    1))
+
+(defthm |foo works|
+    (implies (and (rationalp x))
+        (> (foo x) 0)))
+
+(defconst *foo* 1)
+
+(std::defaggregate foo
+  ((x (rationalp x)) (y (rationalp y))))
+
+(prog2\$ (cw "hello, world!~%" ) nil)'
+`;
