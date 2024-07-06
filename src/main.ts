@@ -30,16 +30,8 @@ export function error(line: number, message: string) {
 
 if (import.meta.main) {
   run(`
-    function complex(x: number) {
-      if (x == 0) {
-        return false;
-      } else if (x == 1) {
-        y = 100;
-      } else {
-        y = 10;
-      }
-      y = y / 2;
-      return y;
+    function foo(x: number) {
+      return x = 1;
     }
   `);
   //   run(`

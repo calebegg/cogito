@@ -20,20 +20,49 @@ function getFirstBody(p: Program) {
   }
 }
 
-Deno.test('check returns in some basic functions', () => {
+Deno.test('check returns in some basic functions [positive]', () => {
   function test(source: string) {
     assert(endsInReturn(getFirstBody(parse(scan(source)))));
   }
 
   test(outdent`
+      function foo(x: number) {
+        return x == 1;
+      }
+    `);
+  test(outdent`
+      theorem |foo runs|(x: number) {
+        y = x + 2;
+        return foo(y);
+      }
+    `);
+  test(outdent`
+      function complex(x: number) {
+        if (x == 0) {
+          return false;
+        } else if (x == 1) {
+          return true;
+        } else {
+          y = 100;
+        }
+        y = y / 2;
+        return y;
+      }
+    `);
+});
+Deno.test('check returns in some basic functions [negative]', () => {
+  function test(source: string) {
+    assert(!endsInReturn(getFirstBody(parse(scan(source)))));
+  }
+
+  test(outdent`
     function foo(x: number) {
-      return x = 1;
+        assert(x > 0);
     }
   `);
   test(outdent`
     theorem |foo runs|(x: number) {
       y = x + 2;
-      return foo(y);
     }
   `);
   test(outdent`
@@ -45,8 +74,6 @@ Deno.test('check returns in some basic functions', () => {
       } else {
         y = 100;
       }
-      y = y / 2;
-      return y;
     }
   `);
 });
