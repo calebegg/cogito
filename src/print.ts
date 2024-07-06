@@ -1,9 +1,12 @@
+import outdent from 'https://deno.land/x/outdent@v0.8.0/mod.ts';
 import {error} from './main.ts';
-import {Node, NodeType, Parameter} from './parse.ts';
-import outdent from 'http://deno.land/x/outdent/mod.ts';
+import {If, Node, NodeType, Parameter, Statement} from './parse.ts';
+import {endsInReturn} from './check.ts';
 
 const frontMatter: string[] = [];
 const structTypes: string[] = [];
+
+const FUNCTION_NAMES = new Map([['==', 'equal']]);
 
 export function print(root: Node): string {
   switch (root.type) {
@@ -18,7 +21,10 @@ export function print(root: Node): string {
     case NodeType.MAIN:
       return print(root.body);
     case NodeType.THEOREM:
-      return `(defthm ${root.name})`;
+      return outdent`
+        (defthm ${root.name}
+            (implies (and ${root.parameters.map(p => printTypeConstraint(p)).join(' ')})
+                ${print(root.body)}))`;
     case NodeType.FUNCTION:
       // Returning 0 is...weird, but 'nil' fails (acl2-numberp return-value)
       // and so fails most measures.
@@ -39,8 +45,12 @@ export function print(root: Node): string {
           (${root.parameters.map(f => `(${f.name} ${printTypeConstraint(f)})`).join(' ')}))`;
     case NodeType.PARAMETER:
       return root.name;
-    case NodeType.STATEMENT:
+    case NodeType.STATEMENT: {
+      if (root.contents.type === NodeType.IF) {
+        return printIf(root.contents, root.rest);
+      }
       return print(root.contents) + (root.rest ? `\n${print(root.rest)})` : '');
+    }
     case NodeType.PRINT:
       return `(prog2$ (cw ${root.template.substring(0, root.template.length - 1)}~%" ${root.expressions.map(e => print(e)).join(' ')})`;
     case NodeType.ASSERT:
@@ -54,8 +64,13 @@ export function print(root: Node): string {
       if (root.value === 'false') return 'nil';
       if (root.value === 'nil') return 'nil';
       return `${root.value}`;
-    case NodeType.FUNCTION_CALL:
-      return `(${root.name} ${root.args.map(a => print(a)).join(' ')})`;
+    case NodeType.FUNCTION_CALL: {
+      let name = root.name;
+      if (FUNCTION_NAMES.has(name)) {
+        name = FUNCTION_NAMES.get(name)!;
+      }
+      return `(${name} ${root.args.map(a => print(a)).join(' ')})`;
+    }
     case NodeType.DOT_ACCESS:
       return `(assoc '${root.right} ${print(root.left)})`;
     case NodeType.LIST_LITERAL:
@@ -63,10 +78,25 @@ export function print(root: Node): string {
       return `(append ${root.contents.map(c => `(list ${print(c)})`).join(' ')})`;
     case NodeType.SPREAD:
       return print(root.value);
+    case NodeType.REDUCE:
+      return 'TODO';
+    case NodeType.IF:
+      throw new Error("Not callable with expressions of type 'IF'");
     default:
       root satisfies never;
       throw new Error('Unreachable');
   }
+}
+
+function printIf(root: If, rest: Statement | null): string {
+  if (!root.rest && !rest) {
+    throw error(root.line, 'Every branch must return a value');
+  }
+  return outdent`
+    (if ${print(root.condition)}
+        ${print(root.body)}
+        ${endsInReturn(root.body) ? '' : print(rest!)}
+        ${root.rest ? printIf(root.rest, rest) : print(rest!)})`;
 }
 
 function printTypeConstraint(parameter: Parameter) {

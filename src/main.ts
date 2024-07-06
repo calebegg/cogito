@@ -23,37 +23,23 @@ let hadError = false;
 export function error(line: number, message: string) {
   hadError = true;
   return new Error(
-    `[line ${line}]: ${message}\n` + sourceCopy.split('\n')[line - 1]
+    `[line ${line}]: ${message}\n` +
+      (sourceCopy ? sourceCopy.split('\n')[line - 1] : '')
   );
 }
 
 if (import.meta.main) {
   run(`
-    const *eight* = 8;
-
-    struct point(
-      x: number,
-      y: number,
-    );
-
-    function pretty-print-point (p: point) {
-      print("[Point x=~x0 y=~x1]", p.x, p.y);
-      return nil;
-    }
-
-    function main() {
-      return pretty-print-point(new point(1/2, 3/2));
-    }
-
-    function factorial(n: natural) {
-      print("Factorializing ~x0", n);
-      // if (n == 0) {
-      //   return 1;
-      // }
-      return n * factorial(n - 1);
-    }
-    theorem |factorial > 0|(x: natural) {
-      return factorial(x) > 0;
+    function complex(x: number) {
+      if (x == 0) {
+        return false;
+      } else if (x == 1) {
+        y = 100;
+      } else {
+        y = 10;
+      }
+      y = y / 2;
+      return y;
     }
   `);
   //   run(`

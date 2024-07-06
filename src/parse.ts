@@ -10,6 +10,7 @@ export enum NodeType {
   EXPR,
   FUNCTION_CALL,
   FUNCTION,
+  IF,
   LIST_LITERAL,
   MAIN,
   PARAMETER,
@@ -75,8 +76,8 @@ export interface Parameter extends NodeMixin<NodeType.PARAMETER> {
   paramType: string;
 }
 
-interface Statement extends NodeMixin<NodeType.STATEMENT> {
-  contents: Print | Assign | Assert | Return;
+export interface Statement extends NodeMixin<NodeType.STATEMENT> {
+  contents: Print | Assign | Assert | Return | If;
   rest: Statement | null;
 }
 
@@ -96,6 +97,13 @@ interface Assign extends NodeMixin<NodeType.ASSIGN> {
 
 interface Assert extends NodeMixin<NodeType.ASSERT> {
   value: Expr;
+}
+
+export interface If extends NodeMixin<NodeType.IF> {
+  condition: Expr;
+  body: Statement;
+  rest: If | null;
+  line: number;
 }
 
 type Expr =
@@ -288,6 +296,9 @@ export function parse(tokens: Token[]) {
       case TokenType.RETURN:
         contents = parseReturn();
         break;
+      case TokenType.IF:
+        contents = parseIf();
+        break;
       default:
         throw error(
           tokens[current].line,
@@ -378,6 +389,37 @@ export function parse(tokens: Token[]) {
     return {
       type: NodeType.MAIN,
       body,
+    };
+  }
+
+  function parseIf(): If {
+    let condition;
+    const line = tokens[current].line;
+    if (tokens[current].type === TokenType.IF) {
+      expect(TokenType.IF);
+      expect(TokenType.LEFT_PAREN);
+      condition = parseExpr();
+      expect(TokenType.RIGHT_PAREN);
+    } else {
+      condition = {
+        type: NodeType.TERMINAL_VALUE,
+        value: 'true',
+      } as const;
+    }
+    expect(TokenType.LEFT_BRACE);
+    const body = parseStatement();
+    expect(TokenType.RIGHT_BRACE);
+    let rest = null;
+    if (tokens[current].type === TokenType.ELSE) {
+      expect(TokenType.ELSE);
+      rest = parseIf();
+    }
+    return {
+      type: NodeType.IF,
+      condition,
+      body,
+      rest,
+      line,
     };
   }
 
@@ -517,6 +559,8 @@ export function parse(tokens: Token[]) {
             TokenType.GREATER_EQUAL,
             TokenType.LESS,
             TokenType.LESS_EQUAL,
+            TokenType.EQUAL_EQUAL,
+            TokenType.BANG_EQUAL,
           ].includes(tokens[current].type)
         ) {
           const op = tokens[current];
