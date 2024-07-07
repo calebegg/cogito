@@ -201,7 +201,7 @@ export function parse(tokens: Token[]) {
           Expected a declaration, got ${TokenType[tokens[current].type]}
           Every top level expression must be a declaration. To have code
           that executes at the top level, introduce a 'main' declaration.
-        `.trim()
+        `.trim(),
       );
     }
   }
@@ -248,7 +248,7 @@ export function parse(tokens: Token[]) {
     const name = expect(TokenType.IDENTIFIER).lexeme;
     if (!name.startsWith('*') && !name.endsWith('*')) {
       throw errorWhileParsing(
-        `Const names must begin and end with '*', *like-this*, got ${name} instead`
+        `Const names must begin and end with '*', *like-this*, got ${name} instead`,
       );
     }
     expect(TokenType.EQUAL);
@@ -326,7 +326,7 @@ export function parse(tokens: Token[]) {
         break;
       default:
         throw errorWhileParsing(
-          `Expected a statement but got ${TokenType[tokens[current].type]}`
+          `Expected a statement but got ${TokenType[tokens[current].type]}`,
         );
     }
     let rest;
@@ -424,7 +424,7 @@ export function parse(tokens: Token[]) {
       throw error(
         tokens[current].line,
         tokens[current].char,
-        'Only one main declaration is allowed'
+        'Only one main declaration is allowed',
       );
     }
     hasMain = true;
@@ -638,7 +638,7 @@ export function parse(tokens: Token[]) {
             throw error(
               tokens[current].line,
               tokens[current].char,
-              'New expressions must be function calls'
+              'New expressions must be function calls',
             );
           }
           return right;
@@ -683,7 +683,7 @@ export function parse(tokens: Token[]) {
         return expect(TokenType.NIL).lexeme;
       default:
         throw errorWhileParsing(
-          `Unexpected token ${TokenType[tokens[current].type]}`
+          `Unexpected token ${TokenType[tokens[current].type]}`,
         );
     }
   }
@@ -695,7 +695,7 @@ export function parse(tokens: Token[]) {
       return token;
     }
     throw errorWhileParsing(
-      `Expected ${types.map(tt => TokenType[tt]).join(', ')} but found ${TokenType[tokens[current].type]}`
+      `Expected ${types.map(tt => TokenType[tt]).join(', ')} but found ${TokenType[tokens[current].type]}`,
     );
   }
 

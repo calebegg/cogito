@@ -149,7 +149,7 @@ function printTypeConstraint(parameter: Parameter) {
       throw error(
         parameter.line,
         parameter.char,
-        `Unknown parameter type ${parameter.paramType}`
+        `Unknown parameter type ${parameter.paramType}`,
       );
   }
 }

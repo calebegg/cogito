@@ -11,8 +11,8 @@ Deno.test('scan a basic function', async t => {
         function foo(x: number) {
           return 1;
         }
-      `
-    )
+      `,
+    ),
   );
 });
 
@@ -24,8 +24,8 @@ Deno.test('scan a basic theorem', async t => {
         theorem |foo works|(x: number) {
           return foo(x) > 0
         }
-      `
-    )
+      `,
+    ),
   );
 });
 
@@ -37,8 +37,8 @@ Deno.test('scan a basic main', async t => {
         main {
           print("hello, world!");
         }
-      `
-    )
+      `,
+    ),
   );
 });
 
@@ -48,8 +48,8 @@ Deno.test('scan a basic const', async t => {
     scan(
       outdent`
         const *foo* = 1_000_000/1_000;
-      `
-    )
+      `,
+    ),
   );
 });
 
@@ -59,8 +59,8 @@ Deno.test('scan a basic struct', async t => {
     scan(
       outdent`
         struct foo(x: number, y: number);
-      `
-    )
+      `,
+    ),
   );
 });
 
@@ -70,8 +70,8 @@ Deno.test('scan a basic assert', async t => {
     scan(
       outdent`
         assert(x > 0);
-      `
-    )
+      `,
+    ),
   );
 });
 
@@ -82,8 +82,8 @@ Deno.test('scan a basic print', async t => {
       outdent`
         print("hello,
         world!");
-      `
-    )
+      `,
+    ),
   );
 });
 
@@ -93,8 +93,8 @@ Deno.test('scan a basic return', async t => {
     scan(
       outdent`
         return 1;
-      `
-    )
+      `,
+    ),
   );
 });
 
@@ -104,8 +104,8 @@ Deno.test('scan a basic assign', async t => {
     scan(
       outdent`
         x = 1;
-      `
-    )
+      `,
+    ),
   );
 });
 
@@ -115,8 +115,8 @@ Deno.test('scan some operators', async t => {
     scan(
       outdent`
         == >= <= != < > = .;
-      `
-    )
+      `,
+    ),
   );
 });
 
@@ -126,8 +126,8 @@ Deno.test('scan a commnet', async t => {
     scan(
       outdent`
         a = 1; // this is important!
-      `
-    )
+      `,
+    ),
   );
 });
 

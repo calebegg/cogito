@@ -36,9 +36,9 @@ Deno.test('parse a basic program', async t => {
           (x, y) = foo(1);
           print("hello, ~x0!", "world");
         }
-      `
-        )
-      )
-    )
+      `,
+        ),
+      ),
+    ),
   );
 });

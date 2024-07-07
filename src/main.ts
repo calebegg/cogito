@@ -10,7 +10,7 @@ export function run(source: string) {
   const tokens = scan(source);
   for (const token of tokens) {
     console.log(
-      `${TokenType[token.type]}: ${token.lexeme} on line ${token.line}`
+      `${TokenType[token.type]}: ${token.lexeme} on line ${token.line}`,
     );
   }
   if (hadError) return;
@@ -27,7 +27,7 @@ export function error(line: number, char: number, message: string) {
     `[line ${line}:${char}]: ${message}\n` +
       (sourceCopy ? sourceCopy.split('\n')[line - 1] + '\n' : '') +
       ' '.repeat(char - 1) +
-      '^'
+      '^',
   );
 }
 

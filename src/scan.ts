@@ -142,7 +142,7 @@ export function scan(source: string): Token[] {
         if (source.charAt(current) === '.') {
           if (source.charAt(current + 1) !== '.') {
             throw lexError(
-              "'.' is an operator and '...' is an operator but '..' is not a thing"
+              "'.' is an operator and '...' is an operator but '..' is not a thing",
             );
           }
           current += 2;
@@ -251,7 +251,7 @@ export function scan(source: string): Token[] {
           }
           addToken(
             KEYWORDS.get(source.substring(start, current)) ??
-              TokenType.IDENTIFIER
+              TokenType.IDENTIFIER,
           );
           continue;
         }

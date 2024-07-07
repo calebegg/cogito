@@ -29,9 +29,9 @@ Deno.test('parse a basic program', async t => {
         main {
           print("hello, ~x0!", "world");
         }
-      `
-      )
-    )
+      `,
+      ),
+    ),
   );
 });
 
@@ -40,7 +40,7 @@ Deno.test('two mains throws', () => {
     () =>
       parse(scan(`main { return foo(state); } main { return bar(state); }`)),
     Error,
-    'Only one main'
+    'Only one main',
   );
 });
 
@@ -48,7 +48,7 @@ Deno.test('invalid const name throws', () => {
   assertThrows(
     () => parse(scan(`const FOO = 3;`)),
     Error,
-    'must begin and end'
+    'must begin and end',
   );
 });
 
@@ -56,7 +56,7 @@ Deno.test('top level code throws', () => {
   assertThrows(
     () => parse(scan(`foo();`)),
     Error,
-    'Every top level expression'
+    'Every top level expression',
   );
 });
 
@@ -64,7 +64,7 @@ Deno.test('expression at body level throws', () => {
   assertThrows(
     () => parse(scan(`function foo() {3;}`)),
     Error,
-    'Expected a statement'
+    'Expected a statement',
   );
 });
 
@@ -72,7 +72,7 @@ Deno.test('improper "new" throws', () => {
   assertThrows(
     () => parse(scan(`function foo() {x = new 1;}`)),
     Error,
-    'must be function calls'
+    'must be function calls',
   );
 });
 
@@ -80,6 +80,6 @@ Deno.test('unbalanced braces throws', () => {
   assertThrows(
     () => parse(scan(`function foo() }`)),
     Error,
-    'Expected LEFT_BRACE but found RIGHT_BRACE'
+    'Expected LEFT_BRACE but found RIGHT_BRACE',
   );
 });
