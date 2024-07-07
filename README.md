@@ -47,9 +47,9 @@ The intent of Cogito is to be a gentle way to access ACL2's power, specifically 
 
 ### Why not just write ACL2?
 
-I consider myself to have an intermediate knowledge of ACL2 ([hatrac](http://hatrac.org) consists of functions and theorems that I wrote as a TA with a collaborator), but I struggle with even basic macros and find myself bewildered by how to structure even simple programs.
+I consider myself to have an intermediate knowledge of ACL2 after writing my undergraduate capstone with it and creating two separate iterations of [Proof Pad](http://new.proofpad.org), but I struggle with even basic macros and find myself bewildered by how to coherently structure even simple programs. For better or worse, I've always wanted a C-like syntax. I think many students early in learning programming would also benefit from this approach.
 
-I've come to believe that **the simplicity of common lisp syntax and parsing** is just shunting off complexity onto the programmer. Even adding basic `printf` style debugging (`cw` in ACL2) requires modifying the structure of your code. In Cogito, it's as simple as adding a `print` statement on a new line.
+Essentially, I've come to believe that **the simplicity of common lisp syntax and parsing** is just shunting off complexity onto the programmer. Even adding basic `printf` style debugging (`cw` in ACL2) requires modifying the structure of your code. In Cogito, it's as simple as adding a `print` statement on a new line.
 
 ### What about the proof attempt output? It's still in lisp
 

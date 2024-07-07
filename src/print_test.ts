@@ -13,7 +13,8 @@ Deno.test('parse a basic program', async t => {
           outdent`
             function foo(x: number) {
               if (x == 0) {
-                return 3;
+                x = reduce([1, 2, 3], (x, y) => x + y, 0);
+                return x;
               } else if (x == 1) {
                 y = [1, 2, 3, ...y];
               } else {
@@ -28,7 +29,7 @@ Deno.test('parse a basic program', async t => {
 
             const *foo* = 1;
 
-            struct foo(x: number, y: number);
+            struct foo(x: list<number>, y: number);
 
             main {
               assert(3 > 2);

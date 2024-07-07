@@ -8,7 +8,7 @@ Deno.test('scan a basic function', async t => {
     t,
     scan(
       outdent`
-        function foo(x: number) {
+        function foo(x: list<number>) {
           return 1;
         }
       `,

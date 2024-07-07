@@ -12,12 +12,12 @@ export enum NodeType {
   FUNCTION_CALL,
   FUNCTION,
   IF,
+  LAMBDA,
   LIST_LITERAL,
   MAIN,
   PARAMETER,
   PRINT,
   PROGRAM,
-  REDUCE,
   RETURN,
   SPREAD,
   STATEMENT,
@@ -124,11 +124,11 @@ export interface Else extends NodeMixin<NodeType.ELSE> {
 
 type Expr =
   | DotAccess
-  | TerminalValue
   | FunctionCall
+  | Lambda
   | ListLiteral
   | Spread
-  | Reduce
+  | TerminalValue
   | Tuple;
 
 interface DotAccess extends NodeMixin<NodeType.DOT_ACCESS> {
@@ -153,13 +153,13 @@ interface Spread extends NodeMixin<NodeType.SPREAD> {
   value: Expr;
 }
 
-interface Reduce extends NodeMixin<NodeType.REDUCE> {
-  parameters: Parameter[];
-  body: Statement;
-}
-
 interface Tuple extends NodeMixin<NodeType.TUPLE> {
   values: Expr[];
+}
+
+interface Lambda extends NodeMixin<NodeType.LAMBDA> {
+  parameters: string[];
+  body: Expr;
 }
 
 export function parse(tokens: Token[]) {
@@ -185,6 +185,7 @@ export function parse(tokens: Token[]) {
 
   // declaration -> function | theorem | const | struct | main
   function parseDeclaration(): Declaration {
+    // TODO: add imports
     if (tokens[current].type === TokenType.FUNCTION) {
       return parseFunction();
     } else if (tokens[current].type === TokenType.THEOREM) {
@@ -333,6 +334,9 @@ export function parse(tokens: Token[]) {
     if (tokens[current].type === TokenType.RIGHT_BRACE) {
       rest = null;
     } else {
+      if (contents.type === NodeType.RETURN) {
+        throw errorWhileParsing('Unreachable code');
+      }
       rest = parseStatement();
     }
     return {
@@ -499,21 +503,6 @@ export function parse(tokens: Token[]) {
         contents,
       };
     }
-    // Reducers
-    if (tokens[current].type === TokenType.REDUCE) {
-      expect(TokenType.REDUCE);
-      expect(TokenType.LEFT_PAREN);
-      const parameters = parseParameters();
-      expect(TokenType.RIGHT_PAREN);
-      expect(TokenType.LEFT_BRACE);
-      const body = parseStatement();
-      expect(TokenType.RIGHT_BRACE);
-      return {
-        type: NodeType.REDUCE,
-        parameters,
-        body,
-      };
-    }
     // Binary expressions
     switch (level) {
       case 0: {
@@ -596,6 +585,21 @@ export function parse(tokens: Token[]) {
               values.push(parseExpr());
             }
             expect(TokenType.RIGHT_PAREN);
+            if (tokens[current].type === TokenType.ARROW) {
+              expect(TokenType.ARROW);
+              // TODO: Support block bodies
+              const body = parseExpr();
+              if (values.every(v => v.type !== NodeType.TERMINAL_VALUE)) {
+                throw errorWhileParsing(
+                  'Parameters to an arrow function must be identifiers',
+                );
+              }
+              return {
+                type: NodeType.LAMBDA,
+                parameters: values.map(v => (v as TerminalValue).value),
+                body,
+              };
+            }
             return {
               type: NodeType.TUPLE,
               values,

@@ -19,6 +19,7 @@ Deno.test('parse a basic program', async t => {
         }
 
         theorem |foo works|(x: number) {
+          x = reduce([1, 2, 3], (x, y) => x + y, 0);
           return foo(3,) > 0;
         }
 
@@ -81,5 +82,13 @@ Deno.test('unbalanced braces throws', () => {
     () => parse(scan(`function foo() }`)),
     Error,
     'Expected LEFT_BRACE but found RIGHT_BRACE',
+  );
+});
+
+Deno.test('unreachable code throws', () => {
+  assertThrows(
+    () => parse(scan(`function foo() { return 1; x = 2; }`)),
+    Error,
+    'Unreachable',
   );
 });

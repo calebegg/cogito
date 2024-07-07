@@ -27,6 +27,7 @@ export enum TokenType {
   GREATER_EQUAL,
   LESS,
   LESS_EQUAL,
+  ARROW,
 
   // Literals
   IDENTIFIER,
@@ -44,7 +45,6 @@ export enum TokenType {
   NEW,
   NIL,
   PRINT,
-  REDUCE,
   RETURN,
   STRUCT,
   THEOREM,
@@ -64,7 +64,6 @@ const KEYWORDS = new Map([
   ['new', TokenType.NEW],
   ['nil', TokenType.NIL],
   ['print', TokenType.PRINT],
-  ['reduce', TokenType.REDUCE],
   ['return', TokenType.RETURN],
   ['struct', TokenType.STRUCT],
   ['theorem', TokenType.THEOREM],
@@ -163,6 +162,9 @@ export function scan(source: string): Token[] {
         if (source.charAt(current) === '=') {
           current++;
           addToken(TokenType.EQUAL_EQUAL);
+        } else if (source.charAt(current) === '>') {
+          current++;
+          addToken(TokenType.ARROW);
         } else {
           addToken(TokenType.EQUAL);
         }
@@ -242,11 +244,11 @@ export function scan(source: string): Token[] {
           continue;
         }
         if (c.match(/[a-zA-Z_*]/)) {
-          if (c === '*' && !source.charAt(current).match(/[a-zA-Z0-9_-]/)) {
+          if (c === '*' && !source.charAt(current).match(/[a-zA-Z0-9_<>-]/)) {
             addToken(TokenType.STAR);
             continue;
           }
-          while (source.charAt(current).match(/[a-zA-Z0-9_*-]/)) {
+          while (source.charAt(current).match(/[a-zA-Z0-9_*<>-]/)) {
             current++;
           }
           addToken(
