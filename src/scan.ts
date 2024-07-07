@@ -118,10 +118,10 @@ export function scan(source: string): Token[] {
         addToken(TokenType.RIGHT_BRACE);
         break;
       case '[':
-        addToken(TokenType.LEFT_BRACE);
+        addToken(TokenType.LEFT_BRACKET);
         break;
       case ']':
-        addToken(TokenType.RIGHT_BRACE);
+        addToken(TokenType.RIGHT_BRACKET);
         break;
       case ',':
         addToken(TokenType.COMMA);

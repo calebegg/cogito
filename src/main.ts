@@ -24,7 +24,7 @@ let hadError = false;
 export function error(line: number, char: number, message: string) {
   hadError = true;
   return new Error(
-    `[line ${line}]: ${message}\n` +
+    `[line ${line}:${char}]: ${message}\n` +
       (sourceCopy ? sourceCopy.split('\n')[line - 1] + '\n' : '') +
       ' '.repeat(char - 1) +
       '^'

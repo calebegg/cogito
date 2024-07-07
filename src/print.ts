@@ -1,6 +1,6 @@
 import outdent from 'https://deno.land/x/outdent@v0.8.0/mod.ts';
 import {error} from './main.ts';
-import {If, Node, NodeType, Parameter, Statement} from './parse.ts';
+import {Else, If, Node, NodeType, Parameter, Statement} from './parse.ts';
 import {endsInReturn} from './check.ts';
 
 const frontMatter: string[] = [];
@@ -99,6 +99,8 @@ export function print(root: Node): string {
       return 'TODO';
     case NodeType.IF:
       throw new Error("Not callable with expressions of type 'IF'");
+    case NodeType.ELSE:
+      throw new Error("Not callable with expressions of type 'IF'");
     case NodeType.TUPLE:
       return `(mv ${root.values.map(v => print(v)).join(' ')})`;
     default:
@@ -107,15 +109,25 @@ export function print(root: Node): string {
   }
 }
 
-function printIf(root: If, rest: Statement | null): string {
-  if (!root.rest && !rest) {
+function printIf(root: If | Else, rest: Statement | null): string {
+  if (root.type == NodeType.ELSE) {
+    const body = print(root.body);
+    if (endsInReturn(root.body)) {
+      return body;
+    }
+    if (!rest) {
+      throw error(root.line, root.char, 'Every branch must return a value');
+    }
+    return body + print(rest);
+  }
+  if (!root.elseBranch && !rest) {
     throw error(root.line, root.char, 'Every branch must return a value');
   }
   return outdent`
     (if ${print(root.condition)}
         ${print(root.body)}
         ${endsInReturn(root.body) ? '' : print(rest!)}
-        ${root.rest ? printIf(root.rest, rest) : print(rest!)})`;
+        ${root.elseBranch ? printIf(root.elseBranch, rest) : print(rest!)})`;
 }
 
 function printTypeConstraint(parameter: Parameter) {

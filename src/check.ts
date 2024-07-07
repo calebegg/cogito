@@ -1,10 +1,12 @@
-import {Statement, If, NodeType} from './parse.ts';
+import {Statement, If, Else, NodeType} from './parse.ts';
 
-export function endsInReturn(root: Statement | If | null): boolean {
+export function endsInReturn(root: Statement | If | Else | null): boolean {
   if (!root) return false;
   switch (root.type) {
     case NodeType.IF:
-      return endsInReturn(root.body) && endsInReturn(root.rest);
+      return endsInReturn(root.body) && endsInReturn(root.elseBranch);
+    case NodeType.ELSE:
+      return endsInReturn(root.body);
     case NodeType.STATEMENT:
       switch (root.contents.type) {
         case NodeType.RETURN:
@@ -15,6 +17,8 @@ export function endsInReturn(root: Statement | If | null): boolean {
         case NodeType.PRINT:
           return endsInReturn(root.rest);
         case NodeType.IF:
+          return endsInReturn(root.rest) || endsInReturn(root.contents);
+        case NodeType.ELSE:
           return endsInReturn(root.rest) || endsInReturn(root.contents);
         default:
           root.contents satisfies never;
