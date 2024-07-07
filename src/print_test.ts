@@ -4,7 +4,7 @@ import {parse} from './parse.ts';
 import {print} from './print.ts';
 import {assertSnapshot} from 'https://deno.land/std@0.224.0/testing/snapshot.ts';
 
-Deno.test('parse a basic program', async t => {
+Deno.test('print a basic program', async t => {
   await assertSnapshot(
     t,
     print(

@@ -33,12 +33,14 @@ export function error(line: number, char: number, message: string) {
 
 if (import.meta.main) {
   run(outdent`
-    function foo(x: number) {
-      return "hello;
-    }
+    struct point(x: number, y: number);
 
     main {
-      (foo, bar) = foo(3);
+      print("hello, world!");
+      print("~x0", reduce([1, 2, 3], (x, y) => x + y, 0));
+      print("~x0", map([1, 2, 3], (x) => x + 1));
+      print("~x0", flat-map([1, 2, 3], (x) => [x, x + 1]));
+      return 0;
     }
   `);
   //   run(`

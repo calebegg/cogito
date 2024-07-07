@@ -586,19 +586,7 @@ export function parse(tokens: Token[]) {
             }
             expect(TokenType.RIGHT_PAREN);
             if (tokens[current].type === TokenType.ARROW) {
-              expect(TokenType.ARROW);
-              // TODO: Support block bodies
-              const body = parseExpr();
-              if (values.every(v => v.type !== NodeType.TERMINAL_VALUE)) {
-                throw errorWhileParsing(
-                  'Parameters to an arrow function must be identifiers',
-                );
-              }
-              return {
-                type: NodeType.LAMBDA,
-                parameters: values.map(v => (v as TerminalValue).value),
-                body,
-              };
+              return parseLambda(values);
             }
             return {
               type: NodeType.TUPLE,
@@ -606,6 +594,9 @@ export function parse(tokens: Token[]) {
             };
           }
           expect(TokenType.RIGHT_PAREN);
+          if (tokens[current].type === TokenType.ARROW) {
+            return parseLambda([inside]);
+          }
           return inside;
         }
         // Unary expressions
@@ -671,6 +662,22 @@ export function parse(tokens: Token[]) {
         }
     }
     throw new Error('Unreachable code');
+  }
+
+  function parseLambda(maybeParams: Expr[]): Lambda {
+    expect(TokenType.ARROW);
+    // TODO: Support block bodies
+    const body = parseExpr();
+    if (maybeParams.every(v => v.type !== NodeType.TERMINAL_VALUE)) {
+      throw errorWhileParsing(
+        'Parameters to an arrow function must be identifiers',
+      );
+    }
+    return {
+      type: NodeType.LAMBDA,
+      parameters: maybeParams.map(v => (v as TerminalValue).value),
+      body,
+    };
   }
 
   function parseLiteral() {

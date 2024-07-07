@@ -35,7 +35,7 @@ Compared to writing raw ACL2, Cogito presents:
 - A straightforward way to print debugging information
 - The ability to easily define local variables without deep nesting
 - TypeScript-style parameter types for functions and theorems that set up total functions and sane theorems without extra effort
-- Syntactic sugar for common list operations like `map`, `flatMap`, `reduce`, `filter`, and `zipWith`
+- Global functions for common list operations like `map`, `flatMap`, `reduce`, `filter`, and `zipWith`
 
 ## More details
 
