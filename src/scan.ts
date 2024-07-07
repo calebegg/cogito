@@ -200,7 +200,7 @@ export function scan(source: string): Token[] {
           current++;
         }
         if (current >= source.length) {
-          lexError('Unterminated string.');
+          throw lexError('Unterminated string.');
         }
         current++;
         addToken(TokenType.STRING);
@@ -208,13 +208,12 @@ export function scan(source: string): Token[] {
       case '|':
         while (source.charAt(current) !== '|' && current < source.length) {
           if (source.charAt(current) === '\n') {
-            lexError("Unexpected end of line while looking for '|'");
-            break;
+            throw lexError("Unexpected end of line while looking for '|'");
           }
           current++;
         }
         if (current >= source.length) {
-          lexError('Unterminated identifier.');
+          throw lexError('Unterminated identifier.');
         }
         current++;
         addToken(TokenType.IDENTIFIER);
@@ -256,8 +255,7 @@ export function scan(source: string): Token[] {
           );
           continue;
         }
-        lexError('Unexpected character.');
-        break;
+        throw lexError('Unexpected character.');
     }
   }
   return [

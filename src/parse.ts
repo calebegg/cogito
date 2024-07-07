@@ -390,7 +390,6 @@ export function parse(tokens: Token[]) {
   // assign -> IDENTIFIER '=' expr ';'
   // assign -> '(' ID (',' ID)* ','? ')' '=' expr ';'
   function parseAssign(): Assign | TupleAssign {
-    console.log(current, tokens[current]);
     if (tokens[current].type === TokenType.LEFT_PAREN) {
       expect(TokenType.LEFT_PAREN);
       const names = [expect(TokenType.IDENTIFIER).lexeme];
@@ -521,6 +520,7 @@ export function parse(tokens: Token[]) {
         const left = parseExpr(level + 1);
         if (tokens[current].type === TokenType.DOT) {
           expect(TokenType.DOT);
+          // TODO: x.y.z
           const right = expect(TokenType.IDENTIFIER).lexeme;
           return {
             type: NodeType.DOT_ACCESS,

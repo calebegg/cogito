@@ -34,7 +34,7 @@ export function error(line: number, char: number, message: string) {
 if (import.meta.main) {
   run(outdent`
     function foo(x: number) {
-      return (x == 1, x == 0);
+      return "hello;
     }
 
     main {

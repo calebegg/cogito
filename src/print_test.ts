@@ -12,7 +12,14 @@ Deno.test('parse a basic program', async t => {
         scan(
           outdent`
         function foo(x: number) {
-          return 1;
+          if (x == 0) {
+            return 3;
+          } else if (x == 1) {
+            y = [1, 2, 3, ...y];
+          } else {
+            return x.y;
+          }
+          return (1, 2, 3);
         }
 
         theorem |foo works|(x: number) {
@@ -24,8 +31,10 @@ Deno.test('parse a basic program', async t => {
         struct foo(x: number, y: number);
 
         main {
+          assert(3 > 2);
+          print("hi", true + false + nil == 3);
           (x, y) = foo(1);
-          print("hello, world!");
+          print("hello, ~x0!", "world");
         }
       `
         )

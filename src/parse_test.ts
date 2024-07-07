@@ -67,3 +67,19 @@ Deno.test('expression at body level throws', () => {
     'Expected a statement'
   );
 });
+
+Deno.test('improper "new" throws', () => {
+  assertThrows(
+    () => parse(scan(`function foo() {x = new 1;}`)),
+    Error,
+    'must be function calls'
+  );
+});
+
+Deno.test('unbalanced braces throws', () => {
+  assertThrows(
+    () => parse(scan(`function foo() }`)),
+    Error,
+    'Expected LEFT_BRACE but found RIGHT_BRACE'
+  );
+});

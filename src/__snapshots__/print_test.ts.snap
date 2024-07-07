@@ -1,13 +1,19 @@
 export const snapshot = {};
 
 snapshot[`parse a basic program 1`] = `
-'(include-book "std/util/defaggregate" :dir :system)
+\`(include-book "std/util/defaggregate" :dir :system)
 
 (defun foo (x)
   (declare (xargs :guard (and (rationalp x))))
   (if (not (and (rationalp x)))
     0
-    1))
+    (if (equal x 0)
+    3
+    
+    (if (equal x 1)
+    (let ((y (append (list 1) (list 2) (list 3) (list y))))
+    (mv 1 2 3)
+    (assoc 'y x)))))
 
 (defthm |foo works|
     (implies (and (rationalp x))
@@ -18,6 +24,8 @@ snapshot[`parse a basic program 1`] = `
 (std::defaggregate foo
   ((x (rationalp x)) (y (rationalp y))))
 
+(assert\$ (> 3 2)
+(prog2\$ (cw "hi~%" (+ t (+ nil (equal nil 3))))
 (mv-let (x y) (foo 1)
-(prog2\$ (cw "hello, world!~%" ) nil))'
+(prog2\$ (cw "hello, ~x0!~%" "world") nil))))\`
 `;

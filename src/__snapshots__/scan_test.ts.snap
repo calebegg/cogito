@@ -310,20 +310,20 @@ snapshot[`scan a basic const 1`] = `
   },
   {
     char: 15,
-    lexeme: "1_000_000",
+    lexeme: "1_000_000/1_000",
     line: 1,
-    literal: "1000000",
+    literal: "1000000/1000",
     type: 25,
   },
   {
-    char: 24,
+    char: 30,
     lexeme: ";",
     line: 1,
     literal: ";",
     type: 11,
   },
   {
-    char: 23,
+    char: 29,
     lexeme: "",
     line: 1,
     type: 41,
@@ -504,29 +504,31 @@ snapshot[`scan a basic print 1`] = `
   },
   {
     char: 7,
-    lexeme: '"hello, world!"',
-    line: 1,
-    literal: '"hello, world!"',
+    lexeme: '"hello,
+world!"',
+    line: 2,
+    literal: '"hello,
+world!"',
     type: 24,
   },
   {
     char: 22,
     lexeme: ")",
-    line: 1,
+    line: 2,
     literal: ")",
     type: 1,
   },
   {
     char: 23,
     lexeme: ";",
-    line: 1,
+    line: 2,
     literal: ";",
     type: 11,
   },
   {
     char: 22,
     lexeme: "",
-    line: 1,
+    line: 2,
     type: 41,
   },
 ]
@@ -596,6 +598,119 @@ snapshot[`scan a basic assign 1`] = `
   },
   {
     char: 5,
+    lexeme: "",
+    line: 1,
+    type: 41,
+  },
+]
+`;
+
+snapshot[`scan some operators 1`] = `
+[
+  {
+    char: 1,
+    lexeme: "==",
+    line: 1,
+    literal: "==",
+    type: 18,
+  },
+  {
+    char: 4,
+    lexeme: ">=",
+    line: 1,
+    literal: ">=",
+    type: 20,
+  },
+  {
+    char: 7,
+    lexeme: "<=",
+    line: 1,
+    literal: "<=",
+    type: 22,
+  },
+  {
+    char: 10,
+    lexeme: "!",
+    line: 1,
+    literal: "!",
+    type: 16,
+  },
+  {
+    char: 13,
+    lexeme: "<",
+    line: 1,
+    literal: "<",
+    type: 21,
+  },
+  {
+    char: 15,
+    lexeme: ">",
+    line: 1,
+    literal: ">",
+    type: 19,
+  },
+  {
+    char: 17,
+    lexeme: "=",
+    line: 1,
+    literal: "=",
+    type: 17,
+  },
+  {
+    char: 19,
+    lexeme: ".",
+    line: 1,
+    literal: ".",
+    type: 7,
+  },
+  {
+    char: 20,
+    lexeme: ";",
+    line: 1,
+    literal: ";",
+    type: 11,
+  },
+  {
+    char: 19,
+    lexeme: "",
+    line: 1,
+    type: 41,
+  },
+]
+`;
+
+snapshot[`scan a commnet 1`] = `
+[
+  {
+    char: 1,
+    lexeme: "a",
+    line: 1,
+    literal: "a",
+    type: 23,
+  },
+  {
+    char: 3,
+    lexeme: "=",
+    line: 1,
+    literal: "=",
+    type: 17,
+  },
+  {
+    char: 5,
+    lexeme: "1",
+    line: 1,
+    literal: "1",
+    type: 25,
+  },
+  {
+    char: 6,
+    lexeme: ";",
+    line: 1,
+    literal: ";",
+    type: 11,
+  },
+  {
+    char: 7,
     lexeme: "",
     line: 1,
     type: 41,
