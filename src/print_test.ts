@@ -11,32 +11,32 @@ Deno.test('parse a basic program', async t => {
       parse(
         scan(
           outdent`
-        function foo(x: number) {
-          if (x == 0) {
-            return 3;
-          } else if (x == 1) {
-            y = [1, 2, 3, ...y];
-          } else {
-            return x.y;
-          }
-          return (1, 2, 3);
-        }
+            function foo(x: number) {
+              if (x == 0) {
+                return 3;
+              } else if (x == 1) {
+                y = [1, 2, 3, ...y];
+              } else {
+                return x.y;
+              }
+              return (1, 2, 3);
+            }
 
-        theorem |foo works|(x: number) {
-          return foo(x) > 0;
-        }
+            theorem |foo works|(x: number) {
+              return foo(x) > 0;
+            }
 
-        const *foo* = 1;
+            const *foo* = 1;
 
-        struct foo(x: number, y: number);
+            struct foo(x: number, y: number);
 
-        main {
-          assert(3 > 2);
-          print("hi", true + false + nil == 3);
-          (x, y) = foo(1);
-          print("hello, ~x0!", "world");
-        }
-      `,
+            main {
+              assert(3 > 2);
+              print("hi", true + false + nil == 3);
+              (x, y) = foo(1);
+              print("hello, ~x0!", "world");
+            }
+          `,
         ),
       ),
     ),
