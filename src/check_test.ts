@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2024 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import {assert} from 'https://deno.land/std@0.207.0/assert/mod.ts';
 import {scan} from './scan.ts';
 import outdent from 'https://deno.land/x/outdent@v0.8.0/mod.ts';
