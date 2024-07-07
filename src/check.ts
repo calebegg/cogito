@@ -11,6 +11,7 @@ export function endsInReturn(root: Statement | If | null): boolean {
           return true;
         case NodeType.ASSERT:
         case NodeType.ASSIGN:
+        case NodeType.TUPLE_ASSIGN:
         case NodeType.PRINT:
           return endsInReturn(root.rest);
         case NodeType.IF:

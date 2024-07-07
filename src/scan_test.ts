@@ -46,7 +46,7 @@ Deno.test('scan a basic const', async t => {
     t,
     scan(
       outdent`
-        const *foo* = 1;
+        const *foo* = 1_000_000;
       `
     )
   );

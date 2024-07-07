@@ -18,5 +18,6 @@ snapshot[`parse a basic program 1`] = `
 (std::defaggregate foo
   ((x (rationalp x)) (y (rationalp y))))
 
-(prog2\$ (cw "hello, world!~%" ) nil)'
+(mv-let (x y) (foo 1)
+(prog2\$ (cw "hello, world!~%" ) nil))'
 `;

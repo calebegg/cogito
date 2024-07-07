@@ -69,9 +69,11 @@ export function print(root: Node): string {
     case NodeType.PRINT:
       return `(prog2$ (cw ${root.template.substring(0, root.template.length - 1)}~%" ${root.expressions.map(e => print(e)).join(' ')})`;
     case NodeType.ASSERT:
-      return `(assert$ ${print(root.value)})`;
+      return `(assert$ ${print(root.value)}`;
     case NodeType.ASSIGN:
       return `(let ((${root.name} ${print(root.value)}))`;
+    case NodeType.TUPLE_ASSIGN:
+      return `(mv-let (${root.names.join(' ')}) ${print(root.value)}`;
     case NodeType.RETURN:
       return print(root.value);
     case NodeType.TERMINAL_VALUE:
@@ -97,6 +99,8 @@ export function print(root: Node): string {
       return 'TODO';
     case NodeType.IF:
       throw new Error("Not callable with expressions of type 'IF'");
+    case NodeType.TUPLE:
+      return `(mv ${root.values.map(v => print(v)).join(' ')})`;
     default:
       root satisfies never;
       throw new Error('Unreachable');
@@ -105,7 +109,7 @@ export function print(root: Node): string {
 
 function printIf(root: If, rest: Statement | null): string {
   if (!root.rest && !rest) {
-    throw error(root.line, 'Every branch must return a value');
+    throw error(root.line, root.char, 'Every branch must return a value');
   }
   return outdent`
     (if ${print(root.condition)}
@@ -124,12 +128,15 @@ function printTypeConstraint(parameter: Parameter) {
       return `(true-listp ${parameter.name})`;
     case 'number':
       return `(rationalp ${parameter.name})`;
+    case 'state':
+      return `(state-p ${parameter.name})`;
     default:
       if (structTypes.includes(parameter.paramType)) {
         return `(${parameter.paramType}-p ${parameter.name})`;
       }
       throw error(
         parameter.line,
+        parameter.char,
         `Unknown parameter type ${parameter.paramType}`
       );
   }

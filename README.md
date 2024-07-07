@@ -53,7 +53,9 @@ I've come to believe that **the simplicity of common lisp syntax and parsing** i
 
 ### What about the proof attempt output? It's still in lisp
 
-My approach has always been that: a successful proof attempt is not worth reading, because you're done. An unsuccessful proof attempt is nearly always _also_ not worth reading, because it's so hard to understand. I'd like to use the type inputs to theorems to attempt counterexample production, and I'd also like to explore a reverse transformer from ACL2 output to Cogito like code, but it remains for now as a weakness in Cogito.
+This is a peril with every transpiled language when it comes to runtime issues, but arguably worse in the world of ACL2 proof attempts. In general, my approach has always been that: a successful proof attempt is not worth reading, because you're done. An unsuccessful proof attempt is nearly always _also_ not worth reading, because it's so hard to follow, even if you know ACL2 well.
+
+In the longer term, I'd like to use the type inputs to theorems to attempt counterexample production, and I'd also like to explore a reverse transformer from ACL2 output to Cogito like code, but it remains for now as a weakness in Cogito.
 
 ## Examples
 

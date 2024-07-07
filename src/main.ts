@@ -1,3 +1,4 @@
+import outdent from 'https://deno.land/x/outdent@v0.8.0/mod.ts';
 import {parse} from './parse.ts';
 import {print} from './print.ts';
 import {TokenType, scan} from './scan.ts';
@@ -20,18 +21,24 @@ export function run(source: string) {
 }
 
 let hadError = false;
-export function error(line: number, message: string) {
+export function error(line: number, char: number, message: string) {
   hadError = true;
   return new Error(
     `[line ${line}]: ${message}\n` +
-      (sourceCopy ? sourceCopy.split('\n')[line - 1] : '')
+      (sourceCopy ? sourceCopy.split('\n')[line - 1] + '\n' : '') +
+      ' '.repeat(char - 1) +
+      '^'
   );
 }
 
 if (import.meta.main) {
-  run(`
+  run(outdent`
     function foo(x: number) {
-      return x = 1;
+      return (x == 1, x == 0);
+    }
+
+    main {
+      (foo, bar) = foo(3);
     }
   `);
   //   run(`

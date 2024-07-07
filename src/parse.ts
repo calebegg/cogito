@@ -23,6 +23,8 @@ export enum NodeType {
   STRUCT,
   TERMINAL_VALUE,
   THEOREM,
+  TUPLE,
+  TUPLE_ASSIGN,
 }
 
 export type Node =
@@ -72,12 +74,13 @@ interface Struct extends NodeMixin<NodeType.STRUCT> {
 
 export interface Parameter extends NodeMixin<NodeType.PARAMETER> {
   line: number;
+  char: number;
   name: string;
   paramType: string;
 }
 
 export interface Statement extends NodeMixin<NodeType.STATEMENT> {
-  contents: Print | Assign | Assert | Return | If;
+  contents: Print | Assign | TupleAssign | Assert | Return | If;
   rest: Statement | null;
 }
 
@@ -95,6 +98,11 @@ interface Assign extends NodeMixin<NodeType.ASSIGN> {
   value: Expr;
 }
 
+interface TupleAssign extends NodeMixin<NodeType.TUPLE_ASSIGN> {
+  names: string[];
+  value: Expr;
+}
+
 interface Assert extends NodeMixin<NodeType.ASSERT> {
   value: Expr;
 }
@@ -104,6 +112,7 @@ export interface If extends NodeMixin<NodeType.IF> {
   body: Statement;
   rest: If | null;
   line: number;
+  char: number;
 }
 
 type Expr =
@@ -112,7 +121,8 @@ type Expr =
   | FunctionCall
   | ListLiteral
   | Spread
-  | Reduce;
+  | Reduce
+  | Tuple;
 
 interface DotAccess extends NodeMixin<NodeType.DOT_ACCESS> {
   left: Expr;
@@ -141,9 +151,17 @@ interface Reduce extends NodeMixin<NodeType.REDUCE> {
   body: Statement;
 }
 
+interface Tuple extends NodeMixin<NodeType.TUPLE> {
+  values: Expr[];
+}
+
 let hasMain = false;
 export function parse(tokens: Token[]) {
   let current = 0;
+
+  function errorWhileParsing(msg: string) {
+    return error(tokens[current].line, tokens[current].char, msg);
+  }
 
   // program -> declaration* EOF
   function parseProgram(): Program {
@@ -170,8 +188,7 @@ export function parse(tokens: Token[]) {
     } else if (tokens[current].type === TokenType.MAIN) {
       return parseMain();
     } else {
-      throw error(
-        tokens[current].line,
+      throw errorWhileParsing(
         outdent`
           Expected a declaration, got ${TokenType[tokens[current].type]}
           Every top level expression must be a declaration. To have code
@@ -222,8 +239,7 @@ export function parse(tokens: Token[]) {
     expect(TokenType.CONST);
     const name = expect(TokenType.IDENTIFIER).lexeme;
     if (!name.startsWith('*') && !name.endsWith('*')) {
-      throw error(
-        tokens[current].line,
+      throw errorWhileParsing(
         `Const names must begin and end with '*', *like-this*, got ${name} instead`
       );
     }
@@ -269,10 +285,10 @@ export function parse(tokens: Token[]) {
 
   // parameter -> IDENTIFIER ':' type
   function parseParameter(): Parameter {
-    const {lexeme: name, line} = expect(TokenType.IDENTIFIER);
+    const {lexeme: name, line, char} = expect(TokenType.IDENTIFIER);
     expect(TokenType.COLON);
     const paramType = parseType();
-    return {type: NodeType.PARAMETER, line, name, paramType};
+    return {type: NodeType.PARAMETER, line, char, name, paramType};
   }
 
   // type -> IDENTIFIER
@@ -291,6 +307,7 @@ export function parse(tokens: Token[]) {
         contents = parseAssert();
         break;
       case TokenType.IDENTIFIER:
+      case TokenType.LEFT_PAREN:
         contents = parseAssign();
         break;
       case TokenType.RETURN:
@@ -300,8 +317,7 @@ export function parse(tokens: Token[]) {
         contents = parseIf();
         break;
       default:
-        throw error(
-          tokens[current].line,
+        throw errorWhileParsing(
           `Expected a statement but got ${TokenType[tokens[current].type]}`
         );
     }
@@ -364,22 +380,45 @@ export function parse(tokens: Token[]) {
   }
 
   // assign -> IDENTIFIER '=' expr ';'
-  function parseAssign(): Assign {
+  // assign -> '(' ID (',' ID)* ','? ')' '=' expr ';'
+  function parseAssign(): Assign | TupleAssign {
     // TODO: support foo.x as an lvalue
-    const name = expect(TokenType.IDENTIFIER).lexeme;
-    expect(TokenType.EQUAL);
-    const value = parseExpr();
-    expect(TokenType.SEMICOLON);
-    return {
-      type: NodeType.ASSIGN,
-      name,
-      value,
-    };
+    if (tokens[current].type === TokenType.LEFT_PAREN) {
+      expect(TokenType.LEFT_PAREN);
+      const names = [expect(TokenType.IDENTIFIER).lexeme];
+      while (tokens[current].type === TokenType.COMMA) {
+        expect(TokenType.COMMA);
+        names.push(expect(TokenType.IDENTIFIER).lexeme);
+      }
+      expect(TokenType.RIGHT_PAREN);
+      expect(TokenType.EQUAL);
+      const value = parseExpr();
+      expect(TokenType.SEMICOLON);
+      return {
+        type: NodeType.TUPLE_ASSIGN,
+        names,
+        value,
+      };
+    } else {
+      const name = expect(TokenType.IDENTIFIER).lexeme;
+      expect(TokenType.EQUAL);
+      const value = parseExpr();
+      expect(TokenType.SEMICOLON);
+      return {
+        type: NodeType.ASSIGN,
+        name,
+        value,
+      };
+    }
   }
 
   function parseMain(): Main {
     if (hasMain) {
-      throw error(tokens[current].line, 'Only one main declaration is allowed');
+      throw error(
+        tokens[current].line,
+        tokens[current].char,
+        'Only one main declaration is allowed'
+      );
     }
     hasMain = true;
     expect(TokenType.MAIN);
@@ -394,13 +433,14 @@ export function parse(tokens: Token[]) {
 
   function parseIf(): If {
     let condition;
-    const line = tokens[current].line;
+    const {line, char} = tokens[current];
     if (tokens[current].type === TokenType.IF) {
       expect(TokenType.IF);
       expect(TokenType.LEFT_PAREN);
       condition = parseExpr();
       expect(TokenType.RIGHT_PAREN);
     } else {
+      // TODO: Fix this better
       condition = {
         type: NodeType.TERMINAL_VALUE,
         value: 'true',
@@ -420,6 +460,7 @@ export function parse(tokens: Token[]) {
       body,
       rest,
       line,
+      char,
     };
   }
 
@@ -440,9 +481,25 @@ export function parse(tokens: Token[]) {
   }
 
   function parseExpr(level = 0): Expr {
-    // '(' expr ')'
+    // '(' (expr ',')* expr ')'
     if (tokens[current].type === TokenType.LEFT_PAREN) {
+      expect(TokenType.LEFT_PAREN);
       const inside = parseExpr();
+      if (tokens[current].type === TokenType.COMMA) {
+        const values = [inside];
+        while (tokens[current].type === TokenType.COMMA) {
+          expect(TokenType.COMMA);
+          if (tokens[current].type === TokenType.RIGHT_PAREN) {
+            break;
+          }
+          values.push(parseExpr());
+        }
+        expect(TokenType.RIGHT_PAREN);
+        return {
+          type: NodeType.TUPLE,
+          values,
+        };
+      }
       expect(TokenType.RIGHT_PAREN);
       return inside;
     }
@@ -503,6 +560,7 @@ export function parse(tokens: Token[]) {
       if (right.type !== NodeType.FUNCTION_CALL) {
         throw error(
           tokens[current].line,
+          tokens[current].char,
           'New expressions must be function calls'
         );
       }
@@ -604,7 +662,7 @@ export function parse(tokens: Token[]) {
   function parseLiteral() {
     switch (tokens[current].type) {
       case TokenType.NUMBER:
-        return expect(TokenType.NUMBER).lexeme;
+        return expect(TokenType.NUMBER).literal!;
       case TokenType.STRING:
         return expect(TokenType.STRING).lexeme;
       case TokenType.TRUE:
@@ -614,8 +672,7 @@ export function parse(tokens: Token[]) {
       case TokenType.NIL:
         return expect(TokenType.NIL).lexeme;
       default:
-        throw error(
-          tokens[current].line,
+        throw errorWhileParsing(
           `Unexpected token ${TokenType[tokens[current].type]}`
         );
     }
@@ -627,8 +684,7 @@ export function parse(tokens: Token[]) {
       current++;
       return token;
     }
-    throw error(
-      tokens[current].line,
+    throw errorWhileParsing(
       `Expected ${types.map(tt => TokenType[tt]).join(', ')} but found ${TokenType[tokens[current].type]}`
     );
   }

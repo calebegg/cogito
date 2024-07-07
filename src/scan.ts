@@ -75,6 +75,7 @@ export interface Token {
   type: TokenType;
   lexeme: string;
   line: number;
+  char: number;
   literal?: string;
 }
 
@@ -83,12 +84,18 @@ export function scan(source: string): Token[] {
   let start = 0;
   let current = 0;
   let line = 1;
+  let lineStart = 0;
+
+  function lexError(msg: string) {
+    return error(line, current - lineStart, msg);
+  }
 
   function addToken(type: TokenType, literalMap = (x: string) => x) {
     tokens.push({
       type,
       lexeme: source.substring(start, current),
       line,
+      char: start - lineStart + 1,
       literal: literalMap(source.substring(start, current)),
     });
   }
@@ -134,8 +141,7 @@ export function scan(source: string): Token[] {
       case '.':
         if (source.charAt(current) === '.') {
           if (source.charAt(current + 1) !== '.') {
-            throw error(
-              line,
+            throw lexError(
               "'.' is an operator and '...' is an operator but '..' is not a thing"
             );
           }
@@ -194,7 +200,7 @@ export function scan(source: string): Token[] {
           current++;
         }
         if (current >= source.length) {
-          error(line, 'Unterminated string.');
+          lexError('Unterminated string.');
         }
         current++;
         addToken(TokenType.STRING);
@@ -202,13 +208,13 @@ export function scan(source: string): Token[] {
       case '|':
         while (source.charAt(current) !== '|' && current < source.length) {
           if (source.charAt(current) === '\n') {
-            error(line, "Unexpected end of line while looking for '|'");
+            lexError("Unexpected end of line while looking for '|'");
             break;
           }
           current++;
         }
         if (current >= source.length) {
-          error(line, 'Unterminated identifier.');
+          lexError('Unterminated identifier.');
         }
         current++;
         addToken(TokenType.IDENTIFIER);
@@ -220,6 +226,7 @@ export function scan(source: string): Token[] {
         break;
       case '\n':
         line++;
+        lineStart = current;
         break;
       default:
         if (c.match(/[0-9]/)) {
@@ -249,9 +256,12 @@ export function scan(source: string): Token[] {
           );
           continue;
         }
-        error(line, 'Unexpected character.');
+        lexError('Unexpected character.');
         break;
     }
   }
-  return [...tokens, {type: TokenType.EOF, lexeme: '', line}];
+  return [
+    ...tokens,
+    {type: TokenType.EOF, lexeme: '', line, char: start - lineStart},
+  ];
 }
