@@ -1,6 +1,6 @@
 {
-    "recommendations": [
-        "denoland.vscode-deno",
-        "ryanluker.vscode-coverage-gutters"
-    ]
+  "recommendations": [
+    "denoland.vscode-deno",
+    "ryanluker.vscode-coverage-gutters"
+  ]
 }

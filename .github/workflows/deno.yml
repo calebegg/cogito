@@ -33,6 +33,9 @@ jobs:
 
       - name: Run linter
         run: deno lint
+      
+      - name: Run format check
+        run: deno fmt --check
 
       - name: Run tests
         run: deno test -A
