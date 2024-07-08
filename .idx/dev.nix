@@ -11,7 +11,6 @@
   idx = {
     extensions = [
       "denoland.vscode-deno"
-      "ms-vscode.live-server"
       "ryanluker.vscode-coverage-gutters"
     ];
     # Workspace lifecycle hooks
