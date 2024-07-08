@@ -147,7 +147,7 @@ export function scan(source: string): Token[] {
         if (source.charAt(current) === '.') {
           if (source.charAt(current + 1) !== '.') {
             throw lexError(
-              '\'.\' is an operator and \'...\' is an operator but \'..\' is not a thing',
+              "'.' is an operator and '...' is an operator but '..' is not a thing",
             );
           }
           current += 2;
@@ -216,7 +216,7 @@ export function scan(source: string): Token[] {
       case '|':
         while (source.charAt(current) !== '|' && current < source.length) {
           if (source.charAt(current) === '\n') {
-            throw lexError('Unexpected end of line while looking for \'|\'');
+            throw lexError("Unexpected end of line while looking for '|'");
           }
           current++;
         }

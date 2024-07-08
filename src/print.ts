@@ -184,9 +184,9 @@ export function print(root: Program) {
       case NodeType.SPREAD:
         return printNode(root.value);
       case NodeType.IF:
-        throw new Error('Not callable with expressions of type \'IF\'');
+        throw new Error("Not callable with expressions of type 'IF'");
       case NodeType.ELSE:
-        throw new Error('Not callable with expressions of type \'IF\'');
+        throw new Error("Not callable with expressions of type 'IF'");
       case NodeType.TUPLE:
         return `(mv ${root.values.map((v) => printNode(v)).join(' ')})`;
       case NodeType.LAMBDA:
