@@ -5,20 +5,21 @@
   channel = "stable-23.11"; # or "unstable"
   # Use https://search.nixos.org/packages to find packages
   packages = [
-    pkgs.deno
   ];
   # Sets environment variables in the workspace
   env = {};
   idx = {
     extensions = [
-      # "vscodevim.vim"
+      "denoland.vscode-deno"
+      "ms-vscode.live-server"
+      "ryanluker.vscode-coverage-gutters"
     ];
     # Workspace lifecycle hooks
     workspace = {
       # Runs when a workspace is first created
       onCreate = {
-        # Example: install JS dependencies from NPM
-        # npm-install = "npm install";
+        deno-install = "curl -fsSL https://deno.land/install.sh | sh";
+        deno-path-add = "echo 'PATH=$PATH:~/.deno/bin >> ~/.bashrc";
       };
       # Runs when the workspace is (re)started
       onStart = {
