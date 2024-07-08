@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {assertSnapshot} from 'https://deno.land/std@0.224.0/testing/snapshot.ts';
-import {scan} from './scan.ts';
+import { assertSnapshot } from 'https://deno.land/std@0.224.0/testing/snapshot.ts';
+import { scan } from './scan.ts';
 import outdent from 'https://deno.land/x/outdent@v0.8.0/mod.ts';
-import {assertThrows} from 'https://deno.land/std@0.207.0/assert/assert_throws.ts';
+import { assertThrows } from 'https://deno.land/std@0.207.0/assert/assert_throws.ts';
 
-Deno.test('scan a basic function', async t => {
+Deno.test('scan a basic function', async (t) => {
   await assertSnapshot(
     t,
     scan(
@@ -22,7 +22,7 @@ Deno.test('scan a basic function', async t => {
   );
 });
 
-Deno.test('scan a basic theorem', async t => {
+Deno.test('scan a basic theorem', async (t) => {
   await assertSnapshot(
     t,
     scan(
@@ -35,7 +35,7 @@ Deno.test('scan a basic theorem', async t => {
   );
 });
 
-Deno.test('scan a basic main', async t => {
+Deno.test('scan a basic main', async (t) => {
   await assertSnapshot(
     t,
     scan(
@@ -48,7 +48,7 @@ Deno.test('scan a basic main', async t => {
   );
 });
 
-Deno.test('scan a basic const', async t => {
+Deno.test('scan a basic const', async (t) => {
   await assertSnapshot(
     t,
     scan(
@@ -59,7 +59,7 @@ Deno.test('scan a basic const', async t => {
   );
 });
 
-Deno.test('scan a basic struct', async t => {
+Deno.test('scan a basic struct', async (t) => {
   await assertSnapshot(
     t,
     scan(
@@ -70,7 +70,7 @@ Deno.test('scan a basic struct', async t => {
   );
 });
 
-Deno.test('scan a basic assert', async t => {
+Deno.test('scan a basic assert', async (t) => {
   await assertSnapshot(
     t,
     scan(
@@ -81,7 +81,7 @@ Deno.test('scan a basic assert', async t => {
   );
 });
 
-Deno.test('scan a basic print', async t => {
+Deno.test('scan a basic print', async (t) => {
   await assertSnapshot(
     t,
     scan(
@@ -93,7 +93,7 @@ Deno.test('scan a basic print', async t => {
   );
 });
 
-Deno.test('scan a basic return', async t => {
+Deno.test('scan a basic return', async (t) => {
   await assertSnapshot(
     t,
     scan(
@@ -104,7 +104,7 @@ Deno.test('scan a basic return', async t => {
   );
 });
 
-Deno.test('scan a basic assign', async t => {
+Deno.test('scan a basic assign', async (t) => {
   await assertSnapshot(
     t,
     scan(
@@ -115,7 +115,7 @@ Deno.test('scan a basic assign', async t => {
   );
 });
 
-Deno.test('scan some operators', async t => {
+Deno.test('scan some operators', async (t) => {
   await assertSnapshot(
     t,
     scan(
@@ -126,7 +126,7 @@ Deno.test('scan some operators', async t => {
   );
 });
 
-Deno.test('scan a commnet', async t => {
+Deno.test('scan a commnet', async (t) => {
   await assertSnapshot(
     t,
     scan(

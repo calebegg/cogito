@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {error} from './main.ts';
+import { error } from './main.ts';
 
 export enum TokenType {
   // Single-character tokens
@@ -147,7 +147,7 @@ export function scan(source: string): Token[] {
         if (source.charAt(current) === '.') {
           if (source.charAt(current + 1) !== '.') {
             throw lexError(
-              "'.' is an operator and '...' is an operator but '..' is not a thing",
+              '\'.\' is an operator and \'...\' is an operator but \'..\' is not a thing',
             );
           }
           current += 2;
@@ -216,7 +216,7 @@ export function scan(source: string): Token[] {
       case '|':
         while (source.charAt(current) !== '|' && current < source.length) {
           if (source.charAt(current) === '\n') {
-            throw lexError("Unexpected end of line while looking for '|'");
+            throw lexError('Unexpected end of line while looking for \'|\'');
           }
           current++;
         }
@@ -246,7 +246,7 @@ export function scan(source: string): Token[] {
               current++;
             }
           }
-          addToken(TokenType.NUMBER, n => n.replaceAll(/_/g, ''));
+          addToken(TokenType.NUMBER, (n) => n.replaceAll(/_/g, ''));
           continue;
         }
         if (c.match(/[a-zA-Z_*]/)) {
@@ -268,6 +268,6 @@ export function scan(source: string): Token[] {
   }
   return [
     ...tokens,
-    {type: TokenType.EOF, lexeme: '', line, char: start - lineStart},
+    { type: TokenType.EOF, lexeme: '', line, char: start - lineStart },
   ];
 }

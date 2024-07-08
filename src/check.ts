@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {Statement, If, Else, NodeType} from './parse.ts';
+import { Else, If, NodeType, Statement } from './parse.ts';
 
 export function endsInReturn(root: Statement | If | Else | null): boolean {
   if (!root) return false;

@@ -5,7 +5,7 @@
  */
 
 import outdent from 'https://deno.land/x/outdent@v0.8.0/mod.ts';
-import {error} from './main.ts';
+import { error } from './main.ts';
 import {
   Else,
   If,
@@ -15,7 +15,7 @@ import {
   Program,
   Statement,
 } from './parse.ts';
-import {endsInReturn} from './check.ts';
+import { endsInReturn } from './check.ts';
 
 const FUNCTION_NAMES = new Map([
   ['==', 'equal'],
@@ -42,7 +42,7 @@ export function print(root: Program) {
 
     switch (root.type) {
       case NodeType.PROGRAM: {
-        const progOut = root.declarations.map(d => printNode(d)).join('\n\n');
+        const progOut = root.declarations.map((d) => printNode(d)).join('\n\n');
         return outdent`
         ${frontMatter.join('\n')}
 
@@ -56,16 +56,30 @@ export function print(root: Program) {
         parentDeclarationType = root.type;
         return outdent`
         (defthm ${root.name}
-            (implies (and ${root.parameters.map(p => printTypeConstraint(p, structTypes)).join(' ')})
+            (implies (and ${
+          root.parameters.map((p) => printTypeConstraint(p, structTypes)).join(
+            ' ',
+          )
+        })
                 ${printNode(root.body)}))`;
       case NodeType.FUNCTION:
         parentDeclarationType = root.type;
         // Returning 0 is...weird, but 'nil' fails (acl2-numberp return-value)
         // and so fails most measures.
         return outdent`
-        (defun ${root.name} (${root.parameters.map(p => printNode(p)).join(' ')})
-          (declare (xargs :guard (and ${root.parameters.map(p => printTypeConstraint(p, structTypes)).join(' ')})))
-          (if (not (and ${root.parameters.map(p => printTypeConstraint(p, structTypes)).join(' ')}))
+        (defun ${root.name} (${
+          root.parameters.map((p) => printNode(p)).join(' ')
+        })
+          (declare (xargs :guard (and ${
+          root.parameters.map((p) => printTypeConstraint(p, structTypes)).join(
+            ' ',
+          )
+        })))
+          (if (not (and ${
+          root.parameters.map((p) => printTypeConstraint(p, structTypes)).join(
+            ' ',
+          )
+        }))
             0
             ${printNode(root.body)}))
         `;
@@ -78,7 +92,11 @@ export function print(root: Program) {
         structTypes.push(root.name);
         return outdent`
         (std::defaggregate ${root.name}
-          (${root.parameters.map(f => `(${f.name} ${printTypeConstraint(f, structTypes)})`).join(' ')}))`;
+          (${
+          root.parameters.map((f) =>
+            `(${f.name} ${printTypeConstraint(f, structTypes)})`
+          ).join(' ')
+        }))`;
       case NodeType.PARAMETER:
         return root.name;
       case NodeType.STATEMENT: {
@@ -96,7 +114,9 @@ export function print(root: Program) {
         return printNode(root.contents) + rest;
       }
       case NodeType.PRINT:
-        return `(prog2$ (cw ${root.template.substring(0, root.template.length - 1)}~%" ${root.expressions.map(e => printNode(e)).join(' ')})`;
+        return `(prog2$ (cw ${
+          root.template.substring(0, root.template.length - 1)
+        }~%" ${root.expressions.map((e) => printNode(e)).join(' ')})`;
       case NodeType.ASSERT:
         return `(assert$ ${printNode(root.value)}`;
       case NodeType.ASSIGN:
@@ -152,23 +172,27 @@ export function print(root: Program) {
             addFrontMatter('(defwarrant cogito-zip-with)');
             break;
         }
-        return `(${name} ${root.args.map(a => printNode(a)).join(' ')})`;
+        return `(${name} ${root.args.map((a) => printNode(a)).join(' ')})`;
       }
       case NodeType.DOT_ACCESS:
         return `(assoc '${root.right} ${printNode(root.left)})`;
       case NodeType.LIST_LITERAL:
         // TODO: add spread
-        return `(append ${root.contents.map(c => `(list ${printNode(c)})`).join(' ')})`;
+        return `(append ${
+          root.contents.map((c) => `(list ${printNode(c)})`).join(' ')
+        })`;
       case NodeType.SPREAD:
         return printNode(root.value);
       case NodeType.IF:
-        throw new Error("Not callable with expressions of type 'IF'");
+        throw new Error('Not callable with expressions of type \'IF\'');
       case NodeType.ELSE:
-        throw new Error("Not callable with expressions of type 'IF'");
+        throw new Error('Not callable with expressions of type \'IF\'');
       case NodeType.TUPLE:
-        return `(mv ${root.values.map(v => printNode(v)).join(' ')})`;
+        return `(mv ${root.values.map((v) => printNode(v)).join(' ')})`;
       case NodeType.LAMBDA:
-        return `(lambda$ (${root.parameters.join(' ')}) ${printNode(root.body)})`;
+        return `(lambda$ (${root.parameters.join(' ')}) ${
+          printNode(root.body)
+        })`;
       default:
         root satisfies never;
         throw new Error('Unreachable');
@@ -193,7 +217,9 @@ export function print(root: Program) {
     (if ${printNode(root.condition)}
         ${printNode(root.body)}
         ${endsInReturn(root.body) ? '' : printNode(rest!)}
-        ${root.elseBranch ? printIf(root.elseBranch, rest) : printNode(rest!)})`;
+        ${
+      root.elseBranch ? printIf(root.elseBranch, rest) : printNode(rest!)
+    })`;
   }
 
   function printTypeConstraint(parameter: Parameter, structTypes: string[]) {

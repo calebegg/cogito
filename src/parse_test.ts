@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {scan} from './scan.ts';
+import { scan } from './scan.ts';
 import outdent from 'https://deno.land/x/outdent@v0.8.0/mod.ts';
-import {parse} from './parse.ts';
-import {assertSnapshot} from 'https://deno.land/std@0.224.0/testing/snapshot.ts';
-import {assertThrows} from 'https://deno.land/std@0.207.0/assert/assert_throws.ts';
+import { parse } from './parse.ts';
+import { assertSnapshot } from 'https://deno.land/std@0.224.0/testing/snapshot.ts';
+import { assertThrows } from 'https://deno.land/std@0.207.0/assert/assert_throws.ts';
 
-Deno.test('parse a basic program', async t => {
+Deno.test('parse a basic program', async (t) => {
   await assertSnapshot(
     t,
     parse(

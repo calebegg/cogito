@@ -5,9 +5,9 @@
  */
 
 import outdent from 'https://deno.land/x/outdent@v0.8.0/mod.ts';
-import {parse} from './parse.ts';
-import {print} from './print.ts';
-import {TokenType, scan} from './scan.ts';
+import { parse } from './parse.ts';
+import { print } from './print.ts';
+import { scan, TokenType } from './scan.ts';
 
 let sourceCopy: string;
 

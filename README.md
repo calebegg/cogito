@@ -27,35 +27,63 @@ theorem |is-palindrome works on odd palindromes|(l: list, x: any) {
 
 ## Basic introduction
 
-Cogito is a small, simple, and expressive programming language that uses the [ACL2 theorem prover](https://www.cs.utexas.edu/~moore/acl2/) to execute functions and prove theorems. Its familiar C-like syntax enforces the constraints of ACL2 automatically.
+Cogito is a small, simple, and expressive programming language that uses the
+[ACL2 theorem prover](https://www.cs.utexas.edu/~moore/acl2/) to execute
+functions and prove theorems. Its familiar C-like syntax enforces the
+constraints of ACL2 automatically.
 
 Compared to writing raw ACL2, Cogito presents:
 
 - A C-like syntax that's easy to learn and more familiar to most programmers
 - A straightforward way to print debugging information
 - The ability to easily define local variables without deep nesting
-- TypeScript-style parameter types for functions and theorems that set up total functions and sane theorems without extra effort
-- Global functions for common list operations like `map`, `flatMap`, `reduce`, `filter`, and `zipWith`
+- TypeScript-style parameter types for functions and theorems that set up total
+  functions and sane theorems without extra effort
+- Global functions for common list operations like `map`, `flatMap`, `reduce`,
+  `filter`, and `zipWith`
 
 ## More details
 
-Cogito may superficially look like any other C-like language. But the extra constraints that the syntax enforces actually allow code to be interpreted by the sophisticated automatic ACL2 theorem prover, which can provide much more confidence in your code compared to unit tests.
+Cogito may superficially look like any other C-like language. But the extra
+constraints that the syntax enforces actually allow code to be interpreted by
+the sophisticated automatic ACL2 theorem prover, which can provide much more
+confidence in your code compared to unit tests.
 
-The intent of Cogito is to be a gentle way to access ACL2's power, specifically through the lens of a teaching language for students unfamiliar with functional programming languages. Through its syntax, Cogito provides basic **guard rails** to make sure that the user is writing code that is more likely to succeed in proof attempts without as much cognitive overhead.
+The intent of Cogito is to be a gentle way to access ACL2's power, specifically
+through the lens of a teaching language for students unfamiliar with functional
+programming languages. Through its syntax, Cogito provides basic **guard rails**
+to make sure that the user is writing code that is more likely to succeed in
+proof attempts without as much cognitive overhead.
 
 ## Background for ACL2 experts
 
 ### Why not just write ACL2?
 
-I consider myself to have an intermediate knowledge of ACL2 after writing my undergraduate capstone with it and creating two separate iterations of [Proof Pad](http://new.proofpad.org), but I struggle with even basic macros and find myself bewildered by how to coherently structure even simple programs. For better or worse, I've always wanted a C-like syntax. I think many students early in learning programming would also benefit from this approach.
+I consider myself to have an intermediate knowledge of ACL2 after writing my
+undergraduate capstone with it and creating two separate iterations of
+[Proof Pad](http://new.proofpad.org), but I struggle with even basic macros and
+find myself bewildered by how to coherently structure even simple programs. For
+better or worse, I've always wanted a C-like syntax. I think many students early
+in learning programming would also benefit from this approach.
 
-Essentially, I've come to believe that **the simplicity of common lisp syntax and parsing** is just shunting off complexity onto the programmer. Even adding basic `printf` style debugging (`cw` in ACL2) requires modifying the structure of your code. In Cogito, it's as simple as adding a `print` statement on a new line.
+Essentially, I've come to believe that **the simplicity of common lisp syntax
+and parsing** is just shunting off complexity onto the programmer. Even adding
+basic `printf` style debugging (`cw` in ACL2) requires modifying the structure
+of your code. In Cogito, it's as simple as adding a `print` statement on a new
+line.
 
 ### What about the proof attempt output? It's still in lisp
 
-This is a peril with every transpiled language when it comes to runtime issues, but arguably worse in the world of ACL2 proof attempts. In general, my approach has always been that: a successful proof attempt is not worth reading, because you're done. An unsuccessful proof attempt is nearly always _also_ not worth reading, because it's so hard to follow, even if you know ACL2 well.
+This is a peril with every transpiled language when it comes to runtime issues,
+but arguably worse in the world of ACL2 proof attempts. In general, my approach
+has always been that: a successful proof attempt is not worth reading, because
+you're done. An unsuccessful proof attempt is nearly always _also_ not worth
+reading, because it's so hard to follow, even if you know ACL2 well.
 
-In the longer term, I'd like to use the type inputs to theorems to attempt counterexample production, and I'd also like to explore a reverse transformer from ACL2 output to Cogito like code, but it remains for now as a weakness in Cogito.
+In the longer term, I'd like to use the type inputs to theorems to attempt
+counterexample production, and I'd also like to explore a reverse transformer
+from ACL2 output to Cogito like code, but it remains for now as a weakness in
+Cogito.
 
 ## Examples
 

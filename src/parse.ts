@@ -5,8 +5,8 @@
  */
 
 import outdent from 'https://deno.land/x/outdent@v0.8.0/mod.ts';
-import {error} from './main.ts';
-import {Token, TokenType} from './scan.ts';
+import { error } from './main.ts';
+import { Token, TokenType } from './scan.ts';
 
 export enum NodeType {
   ASSERT,
@@ -300,10 +300,10 @@ export function parse(tokens: Token[]) {
 
   // parameter -> IDENTIFIER ':' type
   function parseParameter(): Parameter {
-    const {lexeme: name, line, char} = expect(TokenType.IDENTIFIER);
+    const { lexeme: name, line, char } = expect(TokenType.IDENTIFIER);
     expect(TokenType.COLON);
     const paramType = parseType();
-    return {type: NodeType.PARAMETER, line, char, name, paramType};
+    return { type: NodeType.PARAMETER, line, char, name, paramType };
   }
 
   // type -> IDENTIFIER
@@ -450,7 +450,7 @@ export function parse(tokens: Token[]) {
 
   function parseIf(): If | Else {
     let condition;
-    const {line, char} = tokens[current];
+    const { line, char } = tokens[current];
     if (tokens[current].type === TokenType.IF) {
       expect(TokenType.IF);
       expect(TokenType.LEFT_PAREN);
@@ -467,19 +467,19 @@ export function parse(tokens: Token[]) {
     }
     return condition
       ? {
-          type: NodeType.IF,
-          condition,
-          body,
-          elseBranch,
-          line,
-          char,
-        }
+        type: NodeType.IF,
+        condition,
+        body,
+        elseBranch,
+        line,
+        char,
+      }
       : {
-          type: NodeType.ELSE,
-          body,
-          line,
-          char,
-        };
+        type: NodeType.ELSE,
+        body,
+        line,
+        char,
+      };
   }
 
   function parseExpressions() {
@@ -645,7 +645,7 @@ export function parse(tokens: Token[]) {
           return right;
         }
         if (tokens[current].type === TokenType.IDENTIFIER) {
-          const {lexeme} = expect(TokenType.IDENTIFIER);
+          const { lexeme } = expect(TokenType.IDENTIFIER);
           if (tokens[current].type === TokenType.LEFT_PAREN) {
             expect(TokenType.LEFT_PAREN);
             const args = parseExpressions();
@@ -674,14 +674,14 @@ export function parse(tokens: Token[]) {
     expect(TokenType.ARROW);
     // TODO: Support block bodies
     const body = parseExpr();
-    if (maybeParams.every(v => v.type !== NodeType.TERMINAL_VALUE)) {
+    if (maybeParams.every((v) => v.type !== NodeType.TERMINAL_VALUE)) {
       throw errorWhileParsing(
         'Parameters to an arrow function must be identifiers',
       );
     }
     return {
       type: NodeType.LAMBDA,
-      parameters: maybeParams.map(v => (v as TerminalValue).value),
+      parameters: maybeParams.map((v) => (v as TerminalValue).value),
       body,
     };
   }
@@ -712,7 +712,9 @@ export function parse(tokens: Token[]) {
       return token;
     }
     throw errorWhileParsing(
-      `Expected ${types.map(tt => TokenType[tt]).join(', ')} but found ${TokenType[tokens[current].type]}`,
+      `Expected ${types.map((tt) => TokenType[tt]).join(', ')} but found ${
+        TokenType[tokens[current].type]
+      }`,
     );
   }
 
