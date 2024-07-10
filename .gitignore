@@ -1,0 +1,4 @@
+# Fresh build directory
+www/_fresh/
+# npm dependencies
+node_modules/

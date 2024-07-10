@@ -11,6 +11,10 @@ import { scan, TokenType } from './scan.ts';
 
 let sourceCopy: string;
 
+export function setSource(source: string) {
+  sourceCopy = source;
+}
+
 export function run(source: string) {
   sourceCopy = source;
   const tokens = scan(source);

@@ -1,8 +1,34 @@
 {
+  "lint": {
+    "rules": {
+      "tags": [
+        "fresh",
+        "recommended"
+      ]
+    }
+  },
+  "exclude": [
+    "**/_fresh/*"
+  ],
+  "imports": {
+    "$fresh/": "https://deno.land/x/fresh@1.6.8/",
+    "preact": "https://esm.sh/preact@10.19.6",
+    "preact/": "https://esm.sh/preact@10.19.6/",
+    "@preact/signals": "https://esm.sh/*@preact/signals@1.2.2",
+    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.1",
+    "$std/": "https://deno.land/std@0.216.0/"
+  },
   "tasks": {
-    "test": "deno test --allow-all"
+    "test": "deno test --allow-all",
+    "www": "deno run -A --watch=www/static/,www/routes/ www/dev.ts",
+    "build-www": "deno run -A dev.ts build",
+    "preview-www": "deno run -A main.ts"
   },
   "fmt": {
     "singleQuote": true
+  },
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact"
   }
 }
