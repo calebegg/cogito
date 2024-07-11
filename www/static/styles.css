@@ -1,4 +1,77 @@
+/**
+ * @license
+ * Copyright 2024 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+:root {
+  --pink: #FF5CCD;
+  --orange: #FF9500;
+  --blue: #1814FF;
+
+  --vibrant-pink: #FFB6C1;
+  --vibrant-orange: #FFD700;
+  --vibrant-blue: #00BFFF;
+
+  --pastel-pink: #F9E8ED; 
+  --pastel-orange: #FFEEDD; 
+}
+
+body {
+  max-width: 1500px;
+  margin: 0 auto;
+  background-image: linear-gradient(to bottom right, var(--pastel-pink), var(--pastel-orange));
+  background-position: fixed;
+  min-height: 100vh;
+}
+
 body,
 textarea {
   font-family: monospace;
+  background-color: white;
+  color: #333; /* Dark gray text */
 }
+
+textarea {
+  background: transparent;
+}
+
+textarea.error {
+  background: rgba(255, 0, 0, .05);
+}
+
+a {
+  color: var(--vibrant-blue);
+}
+
+header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+h1 {
+  font-size: 72px;
+  margin: .2em 0;
+  position: relative;
+  display: inline-block;
+}
+
+h1::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 5% 5% 0 0;
+  transform: rotate(-5deg);
+  background-image: linear-gradient(to right, var(--pink), var(--orange)); /* Angled gradient */
+}
+
+/* Syntax Highlighting */
+.cm-keyword { color: var(--vibrant-orange); }
+.cm-string { color: var(--vibrant-pink); }
+.cm-number { color: var(--vibrant-blue); }
+.cm-comment { color: #555; }
+.cm-variableName { color: #333; } 
+
+/* Additional Styles */
+.cm-activeLine { background: rgba(242, 242, 242, 0.5); } /* Semi-transparent active line */
+.cm-gutters { background: rgba(238, 238, 238, 0.5); } /* Semi-transparent gutters */

@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2024 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import outdent from 'https://deno.land/x/outdent@v0.8.0/mod.ts';
 import { Try } from '../islands/Try.tsx';
 
@@ -36,7 +42,9 @@ const INITIAL_SOURCE = outdent`
 export default function Home() {
   return (
     <>
-      <h1>Cogito</h1>
+      <header>
+        <h1>Cogito</h1>
+      </header>
       Hello Kenny, this is just for you, I will put some more explanatory text
       here later.
       <Try initialSource={INITIAL_SOURCE} />

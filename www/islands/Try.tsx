@@ -1,5 +1,12 @@
+/**
+ * @license
+ * Copyright 2024 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { useEffect, useState } from 'preact/hooks';
 import { process } from '../../src/index.ts';
+import { CodeMirror } from '../components/CodeMirror.tsx';
 
 const ws = new WebSocket(`wss://acl2-jbhe53iwqa-uc.a.run.app/acl2`);
 
@@ -40,29 +47,21 @@ export function Try({ initialSource }: { initialSource: string }) {
 
   return (
     <div style='display: flex; gap: 16px;'>
-      <textarea
-        rows={40}
-        cols={80}
-        value={source}
-        onInput={(e) => {
-          setSource((e.target as HTMLTextAreaElement).value);
-        }}
-      />
+      <CodeMirror initialValue={initialSource} onChange={(v) => setSource(v)} />
       <div>
         <p style={{ maxWidth: 400 }}>
           Eventually this will show the output from ACL2 itself, not just the
           source code, but that's broken for complex reasons right now. You can
           copy and paste it into <a href='http://new.proofpad.org'>Proof Pad</a>
           {' '}
-          if you want. Also it's not formatted right because formatting
-          is hard.
+          if you want. Also it's not formatted right because formatting is hard.
         </p>
         <textarea
           readonly
           rows={40}
           cols={80}
           value={output}
-          style={{ background: error ? 'lightred' : 'white' }}
+          className={error ? 'error' : ''}
         />
       </div>
     </div>
