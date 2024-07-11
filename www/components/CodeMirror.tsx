@@ -78,7 +78,8 @@ export function CodeMirror({
   return (
     <div
       ref={refCallback}
-      style={{ height: '100%', width: '80en', overflowY: 'scroll' }}
+      style={{ height: '100%', flex: '1', overflowY: 'scroll' }}
+      aria-label='Cogito editor'
     >
     </div>
   );

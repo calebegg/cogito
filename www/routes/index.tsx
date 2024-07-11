@@ -7,7 +7,14 @@
 import outdent from 'https://deno.land/x/outdent@v0.8.0/mod.ts';
 import { Try } from '../islands/Try.tsx';
 
-const INITIAL_SOURCE = outdent`
+const INTRO_SOURCE = outdent`
+  function hello() {
+    print("Hello, world!");
+    return nil;
+  }
+`;
+
+const FEATURES_SOURCE = outdent`
   function foo(x: number) {
     // You can define local variables
     y = x + 1;
@@ -42,12 +49,64 @@ const INITIAL_SOURCE = outdent`
 export default function Home() {
   return (
     <>
-      <header>
+      <div class='main-header'>
         <h1>Cogito</h1>
-      </header>
-      Hello Kenny, this is just for you, I will put some more explanatory text
-      here later.
-      <Try initialSource={INITIAL_SOURCE} />
+      </div>
+      <section>
+        <p>
+          Cogito is a small, simple, and expressive programming language that
+          uses the{' '}
+          <a href='https://www.cs.utexas.edu/~moore/acl2/'>
+            ACL2 theorem prover
+          </a>{' '}
+          to execute functions and prove theorems. Try it out!
+        </p>
+        <Try initialSource={INTRO_SOURCE} />
+      </section>
+      <section>
+        <div class='header'>
+          <h2></h2>
+        </div>
+      </section>
+      <section>
+        <div class='header'>
+          <h2>Features</h2>
+        </div>
+        <p>
+          More info about features
+        </p>
+        <Try initialSource={FEATURES_SOURCE} />
+      </section>
+      <section>
+        <div class='header'>
+          <h2>Roadmap</h2>
+        </div>
+        <ul>
+          <li>Counterexample generation</li>
+          <li>More robust structs</li>
+          <li>Pattern matching</li>
+          <li>Reverse transpilation for error messages</li>
+        </ul>
+      </section>
+      <section>
+        <div class='header'>
+          <h2>Credits</h2>
+        </div>
+        <ul>
+          <li>
+            <a href='https://ou.edu/content/dam/CoE/GraduatePrograms/Profiles/CS/Page,%20R%202011.pdf'>
+              Rex Page
+            </a>, my Master's thesis advisor and the professor who introduced me
+            to ACL2
+          </li>
+          <li>
+            <a href='https://craftinginterpreters.com/'>
+              Crafting Interpreters by Robert Nystrom
+            </a>, the basis of my parser and the inspiration for finally
+            tackling this project after over a decade of rumination
+          </li>
+        </ul>
+      </section>
     </>
   );
 }

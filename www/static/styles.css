@@ -27,13 +27,14 @@ body {
 
 body,
 textarea {
-  font-family: monospace;
+  font-family: 'Fira Code', monospace;
   background-color: white;
   color: #333; /* Dark gray text */
 }
 
 textarea {
   background: transparent;
+  field-sizing: content;
 }
 
 textarea.error {
@@ -44,16 +45,20 @@ a {
   color: var(--vibrant-blue);
 }
 
-header {
+.main-header {
   text-align: center;
   margin-bottom: 48px;
+}
+
+h1,
+h2 {
+  display: inline-block;
+  position: relative;
 }
 
 h1 {
   font-size: 72px;
   margin: .2em 0;
-  position: relative;
-  display: inline-block;
 }
 
 h1::before {
@@ -62,7 +67,22 @@ h1::before {
   z-index: -1;
   inset: 5% 5% 0 0;
   transform: rotate(-5deg);
-  background-image: linear-gradient(to right, var(--pink), var(--orange)); /* Angled gradient */
+  background-image: linear-gradient(to right, var(--pink), var(--orange));
+}
+
+h2 {
+  font-weight: normal;
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  inset: 90% -10% 0 -10%;
+  background-image: linear-gradient(to right, var(--pink), var(--orange));
+}
+
+p, ul {
+  max-width: 600px;
 }
 
 /* Syntax Highlighting */
@@ -73,5 +93,5 @@ h1::before {
 .cm-variableName { color: #333; } 
 
 /* Additional Styles */
-.cm-activeLine { background: rgba(242, 242, 242, 0.5); } /* Semi-transparent active line */
-.cm-gutters { background: rgba(238, 238, 238, 0.5); } /* Semi-transparent gutters */
+.cm-activeLine { background: rgba(242, 242, 242, 0.5) !important; }
+.cm-gutters { background: transparent !important; }

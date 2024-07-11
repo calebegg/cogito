@@ -48,18 +48,14 @@ export function Try({ initialSource }: { initialSource: string }) {
   return (
     <div style='display: flex; gap: 16px;'>
       <CodeMirror initialValue={initialSource} onChange={(v) => setSource(v)} />
-      <div>
-        <p style={{ maxWidth: 400 }}>
-          Eventually this will show the output from ACL2 itself, not just the
-          source code, but that's broken for complex reasons right now. You can
-          copy and paste it into <a href='http://new.proofpad.org'>Proof Pad</a>
-          {' '}
-          if you want. Also it's not formatted right because formatting is hard.
-        </p>
+      <div style={{ flex: '1' }}>
+        <div>
+          <div id='lisp-tab'>Generated Lisp source</div>
+        </div>
         <textarea
+          style={{ width: '100%', height: '100%' }}
+          aria-labelledby='lisp-tab'
           readonly
-          rows={40}
-          cols={80}
           value={output}
           className={error ? 'error' : ''}
         />
