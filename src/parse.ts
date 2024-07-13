@@ -498,6 +498,7 @@ export function parse(tokens: Token[]) {
     return expressions;
   }
 
+  // TODO: This is right associative!?!?
   function parseExpr(level = 0): Expr {
     // '[' expr* ']'
     if (tokens[current].type === TokenType.LEFT_BRACKET) {
@@ -527,7 +528,12 @@ export function parse(tokens: Token[]) {
       }
       case 1: {
         const left = parseExpr(level + 1);
-        if ([TokenType.STAR, TokenType.SLASH].includes(tokens[current].type)) {
+        if (
+          [TokenType.AMP_AMP, TokenType.PIPE_PIPE, TokenType.SKINNY_ARROW]
+            .includes(
+              tokens[current].type,
+            )
+        ) {
           const op = tokens[current];
           expect(op.type);
           const right = parseExpr(level);
@@ -540,20 +546,6 @@ export function parse(tokens: Token[]) {
         return left;
       }
       case 2: {
-        const left = parseExpr(level + 1);
-        if ([TokenType.PLUS, TokenType.MINUS].includes(tokens[current].type)) {
-          const op = tokens[current];
-          expect(op.type);
-          const right = parseExpr(level);
-          return {
-            type: NodeType.FUNCTION_CALL,
-            name: op.lexeme,
-            args: [left, right],
-          };
-        }
-        return left;
-      }
-      case 3: {
         const left = parseExpr(level + 1);
         if (
           [
@@ -576,7 +568,35 @@ export function parse(tokens: Token[]) {
         }
         return left;
       }
-      case 4:
+      case 3: {
+        const left = parseExpr(level + 1);
+        if ([TokenType.PLUS, TokenType.MINUS].includes(tokens[current].type)) {
+          const op = tokens[current];
+          expect(op.type);
+          const right = parseExpr(level);
+          return {
+            type: NodeType.FUNCTION_CALL,
+            name: op.lexeme,
+            args: [left, right],
+          };
+        }
+        return left;
+      }
+      case 4: {
+        const left = parseExpr(level + 1);
+        if ([TokenType.STAR, TokenType.SLASH].includes(tokens[current].type)) {
+          const op = tokens[current];
+          expect(op.type);
+          const right = parseExpr(level);
+          return {
+            type: NodeType.FUNCTION_CALL,
+            name: op.lexeme,
+            args: [left, right],
+          };
+        }
+        return left;
+      }
+      case 5:
         // '(' (expr ',')* expr ')'
         if (tokens[current].type === TokenType.LEFT_PAREN) {
           expect(TokenType.LEFT_PAREN);
@@ -591,7 +611,7 @@ export function parse(tokens: Token[]) {
               values.push(parseExpr());
             }
             expect(TokenType.RIGHT_PAREN);
-            if (tokens[current].type === TokenType.ARROW) {
+            if (tokens[current].type === TokenType.FAT_ARROW) {
               return parseLambda(values);
             }
             return {
@@ -600,7 +620,7 @@ export function parse(tokens: Token[]) {
             };
           }
           expect(TokenType.RIGHT_PAREN);
-          if (tokens[current].type === TokenType.ARROW) {
+          if (tokens[current].type === TokenType.FAT_ARROW) {
             return parseLambda([inside]);
           }
           return inside;
@@ -671,7 +691,7 @@ export function parse(tokens: Token[]) {
   }
 
   function parseLambda(maybeParams: Expr[]): Lambda {
-    expect(TokenType.ARROW);
+    expect(TokenType.FAT_ARROW);
     // TODO: Support block bodies
     const body = parseExpr();
     if (maybeParams.every((v) => v.type !== NodeType.TERMINAL_VALUE)) {

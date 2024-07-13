@@ -8,57 +8,92 @@ import { useEffect, useState } from 'preact/hooks';
 import { process } from '../../src/index.ts';
 import { CodeMirror } from '../components/CodeMirror.tsx';
 
-const ws = new WebSocket(`wss://acl2-jbhe53iwqa-uc.a.run.app/acl2`);
-
-export interface Acl2Response {
-  Kind: string;
-  Body: string;
+enum Tab {
+  LISP,
+  RAW_ACL2,
 }
 
 export function Try({ initialSource }: { initialSource: string }) {
-  const [output, setOutput] = useState('');
+  const [output, setOutput] = useState<string[]>([]);
+  const [lisp, setLisp] = useState('');
+  const [currentTab, setCurrentTab] = useState(Tab.RAW_ACL2);
   const [source, setSource] = useState(initialSource);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     setError(false);
-    const acl2Source = process(source);
-    let id = -1;
-    if (acl2Source.status === 'error') {
+    const lispSource = process(source);
+    let timeoutId: number | null = null;
+    const ws = new WebSocket(`wss://acl2-jbhe53iwqa-uc.a.run.app/acl2`);
+    setLisp(lispSource.data);
+    if (lispSource.status === 'error') {
       setError(true);
-      setOutput(acl2Source.data);
+      setOutput(['Parse error']);
     } else {
-      setOutput(acl2Source.data);
-      // setOutput('Loading...');
-      // id = setTimeout(() => {
-      //   ws.addEventListener('message', (e) => {
-      //     const data = JSON.parse(e.data) as Acl2Response;
-      //     setError(data.Kind === 'ERROR');
-      //     setOutput(data.Body);
-      //   }, { once: true });
-      //   ws.send(acl2Source.data);
-      // }, 1000);
+      setOutput([]);
+      timeoutId = setTimeout(() => {
+        ws.addEventListener('message', ({ data }) => {
+          setOutput((o) => [...o, data]);
+        });
+        ws.addEventListener('error', () => {
+          setOutput((o) => [...o, 'Unexpected socket error']);
+        });
+        ws.send(lispSource.data);
+        timeoutId = null;
+      }, 1000);
     }
     return () => {
-      clearTimeout(id);
-      setOutput('');
+      if (timeoutId) clearTimeout(timeoutId);
+      if (ws.readyState === WebSocket.OPEN) ws.close();
+      setOutput([]);
     };
   }, [source]);
 
   return (
-    <div style='display: flex; gap: 16px;'>
-      <CodeMirror initialValue={initialSource} onChange={(v) => setSource(v)} />
-      <div style={{ flex: '1' }}>
-        <div>
-          <div id='lisp-tab'>Generated Lisp source</div>
-        </div>
-        <textarea
-          style={{ width: '100%', height: '100%' }}
-          aria-labelledby='lisp-tab'
-          readonly
-          value={output}
-          className={error ? 'error' : ''}
+    <div class='row-on-wide'>
+      <div style={{ paddingTop: 48, flex: 1 }}>
+        <CodeMirror
+          initialValue={initialSource}
+          onChange={(v) => setSource(v)}
         />
+      </div>
+      <div style={{ flex: '1' }}>
+        <div style='display: flex' role='tablist'>
+          <div
+            role='tab'
+            class={'tab ' + (currentTab === Tab.LISP ? 'current' : '')}
+            tabindex={0}
+            onClick={() => setCurrentTab(Tab.LISP)}
+          >
+            Lisp source code
+          </div>
+          <div
+            role='tab'
+            class={'tab ' + (currentTab === Tab.RAW_ACL2 ? 'current' : '')}
+            tabindex={0}
+            onClick={() => setCurrentTab(Tab.RAW_ACL2)}
+          >
+            Raw ACL2 output
+          </div>
+        </div>
+        {currentTab === Tab.LISP
+          ? (
+            <pre
+              style={{ whiteSpace: 'pre-wrap' }}
+              role='tabpanel'
+              class={error ? 'error' : ''}
+            >{lisp}</pre>
+          )
+          : (
+            <div role='tabpanel' style={{ overflow: 'auto', maxHeight: 400 }}>
+              {output.map((o) => (
+                <>
+                  <pre>{o}</pre>
+                  <hr />
+                </>
+              ))}
+            </div>
+          )}
       </div>
     </div>
   );

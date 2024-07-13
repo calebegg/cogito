@@ -10,7 +10,6 @@ import { Try } from '../islands/Try.tsx';
 const INTRO_SOURCE = outdent`
   function hello() {
     print("Hello, world!");
-    return nil;
   }
 `;
 
@@ -26,23 +25,8 @@ const FEATURES_SOURCE = outdent`
     return y;
   }
 
-  theorem |foo works|(x: number) {
+  theorem |foo increases|(x: number) {
     return foo(x) > x;
-  }
-
-  function add-to-end(x: any, l: list) {
-    return reduce(l, (acc, x) => cons(x, acc), [x]);
-  }
-  function rev(l: list) {
-    if (is-empty(l)) {
-      return [];
-    } else {
-      return add-to-end(first(l), rev(rest(l)));
-    }
-  }
-  // This is actually kind of a cool theorem that ACL2 can prove by itself
-  theorem |rev twice returns the original list|(l: list) {
-    return rev(rev(l)) == l;
   }
 `;
 
@@ -72,9 +56,39 @@ export default function Home() {
         <div class='header'>
           <h2>Features</h2>
         </div>
-        <p>
-          More info about features
-        </p>
+        <ul>
+          <li>
+            <b>Easy to Learn, Powerful to Use:</b>{' '}
+            Familiar syntax and concepts for beginners, while offering advanced
+            features like theorems and functional programming for experienced
+            developers.
+          </li>
+          <li>
+            <b>Prove Your Code Works:</b>{' '}
+            Go beyond testing by formally proving the correctness of your
+            functions, ensuring your programs behave exactly as intended.
+          </li>
+          <li>
+            <b>Built-in Formal Methods:</b>{' '}
+            Leverage the power of ACL2, a renowned tool for rigorous software
+            verification, without needing to learn its complex syntax.
+          </li>
+          <li>
+            <b>Concise and Readable:</b>{' '}
+            Write clear, expressive code using intuitive structures like struct
+            for data and types for safety.
+          </li>
+          <li>
+            <b>Functional Programming Made Accessible:</b>{' '}
+            Explore a different style of programming based on functions and
+            recursion, unlocking new problem-solving approaches.
+          </li>
+          <li>
+            <b>Bridge to Advanced Concepts:</b>{' '}
+            A stepping stone to understanding formal verification, functional
+            programming, and the ACL2 ecosystem.
+          </li>
+        </ul>
         <Try initialSource={FEATURES_SOURCE} />
       </section>
       <section>
@@ -86,6 +100,28 @@ export default function Home() {
           <li>More robust structs</li>
           <li>Pattern matching</li>
           <li>Reverse transpilation for error messages</li>
+        </ul>
+      </section>
+      <section>
+        <div class='header'>
+          <h2>Resources</h2>
+        </div>
+        <ul>
+          <li>
+            <a href='https://github.com/calebegg/cogito'>
+              File issues and send PRs on Github
+            </a>
+          </li>
+          <li>
+            <a href='./style-guide'>
+              Style guide (coming soon!)
+            </a>
+          </li>
+          <li>
+            <a href='./for-acl2-power-users'>
+              Some thoughts for ACL2 power users
+            </a>
+          </li>
         </ul>
       </section>
       <section>

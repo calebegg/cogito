@@ -24,6 +24,10 @@ const FUNCTION_NAMES = new Map([
   ['flat-map', 'cogito-flat-map'],
   ['zip-with', 'cogito-zip-with'],
   ['filter', 'cogito-filter'],
+  ['is-empty', 'endp'],
+  ['&&', 'and'],
+  ['||', 'or'],
+  ['->', 'implies'],
 ]);
 
 export function print(root: Program) {
@@ -38,7 +42,6 @@ export function print(root: Program) {
 
   function printNode(root: Node): string {
     const structTypes: string[] = [];
-    let parentDeclarationType: NodeType | null = null;
 
     switch (root.type) {
       case NodeType.PROGRAM: {
@@ -50,10 +53,8 @@ export function print(root: Program) {
       `;
       }
       case NodeType.MAIN:
-        parentDeclarationType = root.type;
         return printNode(root.body);
       case NodeType.THEOREM:
-        parentDeclarationType = root.type;
         return outdent`
         (defthm ${root.name}
             (implies (and ${
@@ -63,7 +64,6 @@ export function print(root: Program) {
         })
                 ${printNode(root.body)}))`;
       case NodeType.FUNCTION:
-        parentDeclarationType = root.type;
         // Returning 0 is...weird, but 'nil' fails (acl2-numberp return-value)
         // and so fails most measures.
         return outdent`
@@ -80,14 +80,12 @@ export function print(root: Program) {
             ' ',
           )
         }))
-            0
+            nil
             ${printNode(root.body)}))
         `;
       case NodeType.CONST:
-        parentDeclarationType = root.type;
         return `(defconst ${root.name} ${printNode(root.value)})`;
       case NodeType.STRUCT:
-        parentDeclarationType = root.type;
         addFrontMatter('(include-book "std/util/defaggregate" :dir :system)');
         structTypes.push(root.name);
         return outdent`
@@ -105,7 +103,6 @@ export function print(root: Program) {
         }
         let rest = root.rest ? `\n${printNode(root.rest)})` : '';
         if (
-          parentDeclarationType == NodeType.MAIN &&
           !root.rest &&
           root.contents.type !== NodeType.RETURN
         ) {
@@ -139,35 +136,65 @@ export function print(root: Program) {
           case 'cogito-reduce':
             addFrontMatter('(include-book "projects/apply/top" :dir :system)');
             addFrontMatter(
-              '(defun cogito-reduce (xs fn init) (if (endp xs) init (apply$ fn (list (first xs) (cogito-reduce (rest xs) fn init)))))',
+              outdent`
+                (defun cogito-reduce (xs fn init)
+                  (declare (xargs :guard (and (true-listp xs) (true-listp fn) (equal (len (cadr fn)) 2))))
+                  (if (endp xs)
+                    init
+                    (apply$ fn (list (first xs) (cogito-reduce (rest xs) fn init)))))
+              `,
             );
             addFrontMatter('(defwarrant cogito-reduce)');
             break;
           case 'cogito-map':
             addFrontMatter('(include-book "projects/apply/top" :dir :system)');
             addFrontMatter(
-              '(defun cogito-map (xs fn) (if (endp xs) xs (cons (apply$ fn (list (first xs))) (cogito-map (rest xs) fn)))))',
+              outdent`
+                (defun cogito-map (xs fn)
+                  (declare (xargs :guard (and (true-listp xs) (true-listp fn) (equal (len (cadr fn)) 1))))
+                  (if (endp xs)
+                    xs
+                    (cons (apply$ fn (list (first xs))) (cogito-map (rest xs) fn)))))
+              `,
             );
             addFrontMatter('(defwarrant cogito-map)');
             break;
           case 'cogito-flat-map':
             addFrontMatter('(include-book "projects/apply/top" :dir :system)');
             addFrontMatter(
-              '(defun cogito-flat-map (xs fn) (if (endp xs) xs (append (apply$ fn (list (first xs))) (cogito-flat-map (rest xs) fn)))))',
+              outdent`
+                (defun cogito-flat-map (xs fn)
+                  (declare (xargs :guard (and (true-listp xs) (true-listp fn) (equal (len (cadr fn)) 1))))
+                  (if (endp xs) xs (append (apply$ fn (list (first xs))) (cogito-flat-map (rest xs) fn)))))
+              `,
             );
             addFrontMatter('(defwarrant cogito-flat-map)');
             break;
           case 'cogito-filter':
             addFrontMatter('(include-book "projects/apply/top" :dir :system)');
             addFrontMatter(
-              '(defun cogito-filter (xs fn) (if (endp xs) xs (let ((ys (cogito-filter (rest xs) fn))) (if (apply$ fn (list (first xs))) (cons (first xs) ys) ys))))',
+              outdent`
+                (defun cogito-filter (xs fn)
+                  (declare (xargs :guard (and (true-listp xs) (true-listp fn) (equal (len (cadr fn)) 1))))
+                  (if (endp xs)
+                    xs
+                    (let ((ys (cogito-filter (rest xs) fn)))
+                      (if (apply$ fn (list (first xs))) (cons (first xs) ys) ys))))
+              `,
             );
             addFrontMatter('(defwarrant cogito-filter)');
             break;
           case 'cogito-zip-with':
             addFrontMatter('(include-book "projects/apply/top" :dir :system)');
             addFrontMatter(
-              '(defun cogito-zip-with (xs ys fn) (if (or (endp xs) (endp ys)) nil (cons (apply$ fn (list (first xs) (first ys))) (cogito-zip-with (rest xs) (rest ys) fn))))) ',
+              outdent`
+                (defun cogito-zip-with (xs ys fn)
+                  (declare (xargs :guard (and (true-listp xs) (true-listp ys) (true-listp fn) (equal (len (cadr fn)) 2))))
+                  (if (or (endp xs) (endp ys))
+                    nil
+                    (cons (apply$ fn (list (first xs) (first ys)))
+                          (cogito-zip-with (rest xs) (rest ys) fn)))))
+              `,
             );
             addFrontMatter('(defwarrant cogito-zip-with)');
             break;

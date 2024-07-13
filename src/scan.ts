@@ -33,7 +33,10 @@ export enum TokenType {
   GREATER_EQUAL,
   LESS,
   LESS_EQUAL,
-  ARROW,
+  FAT_ARROW,
+  SKINNY_ARROW,
+  AMP_AMP,
+  PIPE_PIPE,
 
   // Literals
   IDENTIFIER,
@@ -131,9 +134,6 @@ export function scan(source: string): Token[] {
       case ',':
         addToken(TokenType.COMMA);
         break;
-      case '-':
-        addToken(TokenType.MINUS);
-        break;
       case '+':
         addToken(TokenType.PLUS);
         break;
@@ -142,6 +142,22 @@ export function scan(source: string): Token[] {
         break;
       case ':':
         addToken(TokenType.COLON);
+        break;
+      case '-':
+        if (source.charAt(current) === '>') {
+          current++;
+          addToken(TokenType.SKINNY_ARROW);
+        } else {
+          addToken(TokenType.MINUS);
+        }
+        break;
+      case '&':
+        if (source.charAt(current) === '&') {
+          current++;
+          addToken(TokenType.AMP_AMP);
+        } else {
+          throw lexError('Only && is supported for now');
+        }
         break;
       case '.':
         if (source.charAt(current) === '.') {
@@ -158,8 +174,8 @@ export function scan(source: string): Token[] {
         break;
       case '!':
         if (source.charAt(current) === '=') {
-          addToken(TokenType.BANG_EQUAL);
           current++;
+          addToken(TokenType.BANG_EQUAL);
         } else {
           addToken(TokenType.BANG);
         }
@@ -170,7 +186,7 @@ export function scan(source: string): Token[] {
           addToken(TokenType.EQUAL_EQUAL);
         } else if (source.charAt(current) === '>') {
           current++;
-          addToken(TokenType.ARROW);
+          addToken(TokenType.FAT_ARROW);
         } else {
           addToken(TokenType.EQUAL);
         }
@@ -214,17 +230,22 @@ export function scan(source: string): Token[] {
         addToken(TokenType.STRING);
         break;
       case '|':
-        while (source.charAt(current) !== '|' && current < source.length) {
-          if (source.charAt(current) === '\n') {
-            throw lexError("Unexpected end of line while looking for '|'");
+        if (source.charAt(current) === '|') {
+          current++;
+          addToken(TokenType.PIPE_PIPE);
+        } else {
+          while (source.charAt(current) !== '|' && current < source.length) {
+            if (source.charAt(current) === '\n') {
+              throw lexError("Unexpected end of line while looking for '|'");
+            }
+            current++;
+          }
+          if (current >= source.length) {
+            throw lexError('Unterminated identifier.');
           }
           current++;
+          addToken(TokenType.IDENTIFIER);
         }
-        if (current >= source.length) {
-          throw lexError('Unterminated identifier.');
-        }
-        current++;
-        addToken(TokenType.IDENTIFIER);
         break;
       case ' ':
       case '\r':

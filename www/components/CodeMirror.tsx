@@ -9,21 +9,21 @@ import {
   closeBrackets,
   closeBracketsKeymap,
   completionKeymap,
-} from '@codemirror/autocomplete';
-import { defaultKeymap } from '@codemirror/commands';
+} from "@codemirror/autocomplete@6.17.0";
+import { defaultKeymap } from "@codemirror/commands@6.6.0";
 import {
   bracketMatching,
   defaultHighlightStyle,
   syntaxHighlighting,
-} from '@codemirror/language';
-import { EditorState } from '@codemirror/state';
+} from "@codemirror/language@6.10.2";
+import { EditorState } from "@codemirror/state@6.4.1";
 import {
   drawSelection,
   EditorView,
   highlightActiveLine,
   keymap,
   lineNumbers,
-} from '@codemirror/view';
+} from "@codemirror/view@6.28.4";
 import { useCallback, useEffect, useRef } from 'preact/hooks';
 
 export function CodeMirror({
@@ -78,7 +78,7 @@ export function CodeMirror({
   return (
     <div
       ref={refCallback}
-      style={{ height: '100%', flex: '1', overflowY: 'scroll' }}
+      style={{ height: '100%', width: '100%', overflowY: 'scroll' }}
       aria-label='Cogito editor'
     >
     </div>

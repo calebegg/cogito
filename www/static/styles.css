@@ -25,24 +25,41 @@ body {
   min-height: 100vh;
 }
 
-body,
-textarea {
+@media (max-width: 1516px) {
+  body {
+    margin: 0 8px;
+  }
+}
+
+@media (max-width: 1200px) {
+  pre {
+    width: 25em;
+  }
+}
+
+.row-on-wide {
+  display: flex;
+  gap: 16;
+}
+
+@media (max-width: 800px) {
+  .row-on-wide {
+    flex-direction: column;
+  }
+}
+
+body {
   font-family: 'Fira Code', monospace;
   background-color: white;
-  color: #333; /* Dark gray text */
+  color: #333;
 }
 
-textarea {
-  background: transparent;
-  field-sizing: content;
-}
-
-textarea.error {
+.error {
   background: rgba(255, 0, 0, .05);
 }
 
 a {
-  color: var(--vibrant-blue);
+  color: var(--blue);
 }
 
 .main-header {
@@ -67,7 +84,18 @@ h1::before {
   z-index: -1;
   inset: 5% 5% 0 0;
   transform: rotate(-5deg);
+  transform-origin: 45px center;
   background-image: linear-gradient(to right, var(--pink), var(--orange));
+  animation: .3s 0s ease-in highlighter 1;
+}
+
+@keyframes highlighter {
+  from {
+    right: 100%;
+  }
+  to {
+    right: 5%;
+  }
 }
 
 h2 {
@@ -77,12 +105,25 @@ h2 {
 h2::after {
   content: '';
   position: absolute;
-  inset: 90% -10% 0 -10%;
+  inset: 90% -16px 0;
   background-image: linear-gradient(to right, var(--pink), var(--orange));
 }
 
 p, ul {
   max-width: 600px;
+}
+
+.tab {
+  padding: 8px 8px 0;
+  cursor: pointer;
+}
+
+.tab.current {
+  background: var(--pink);
+}
+
+pre {
+  white-space: pre-wrap;
 }
 
 /* Syntax Highlighting */

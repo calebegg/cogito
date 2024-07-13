@@ -7,14 +7,14 @@ snapshot[`scan a basic function 1`] = `
     lexeme: "function",
     line: 1,
     literal: "function",
-    type: 31,
+    type: 34,
   },
   {
     char: 10,
     lexeme: "foo",
     line: 1,
     literal: "foo",
-    type: 24,
+    type: 27,
   },
   {
     char: 13,
@@ -28,7 +28,7 @@ snapshot[`scan a basic function 1`] = `
     lexeme: "x",
     line: 1,
     literal: "x",
-    type: 24,
+    type: 27,
   },
   {
     char: 15,
@@ -42,7 +42,7 @@ snapshot[`scan a basic function 1`] = `
     lexeme: "list<number>",
     line: 1,
     literal: "list<number>",
-    type: 24,
+    type: 27,
   },
   {
     char: 29,
@@ -63,14 +63,14 @@ snapshot[`scan a basic function 1`] = `
     lexeme: "return",
     line: 2,
     literal: "return",
-    type: 37,
+    type: 40,
   },
   {
     char: 10,
     lexeme: "1",
     line: 2,
     literal: "1",
-    type: 26,
+    type: 29,
   },
   {
     char: 11,
@@ -90,7 +90,7 @@ snapshot[`scan a basic function 1`] = `
     char: 0,
     lexeme: "",
     line: 3,
-    type: 41,
+    type: 44,
   },
 ]
 `;
@@ -102,14 +102,14 @@ snapshot[`scan a basic theorem 1`] = `
     lexeme: "theorem",
     line: 1,
     literal: "theorem",
-    type: 39,
+    type: 42,
   },
   {
     char: 9,
     lexeme: "|foo works|",
     line: 1,
     literal: "|foo works|",
-    type: 24,
+    type: 27,
   },
   {
     char: 20,
@@ -123,7 +123,7 @@ snapshot[`scan a basic theorem 1`] = `
     lexeme: "x",
     line: 1,
     literal: "x",
-    type: 24,
+    type: 27,
   },
   {
     char: 22,
@@ -137,7 +137,7 @@ snapshot[`scan a basic theorem 1`] = `
     lexeme: "number",
     line: 1,
     literal: "number",
-    type: 24,
+    type: 27,
   },
   {
     char: 30,
@@ -158,14 +158,14 @@ snapshot[`scan a basic theorem 1`] = `
     lexeme: "return",
     line: 2,
     literal: "return",
-    type: 37,
+    type: 40,
   },
   {
     char: 10,
     lexeme: "foo",
     line: 2,
     literal: "foo",
-    type: 24,
+    type: 27,
   },
   {
     char: 13,
@@ -179,7 +179,7 @@ snapshot[`scan a basic theorem 1`] = `
     lexeme: "x",
     line: 2,
     literal: "x",
-    type: 24,
+    type: 27,
   },
   {
     char: 15,
@@ -200,7 +200,7 @@ snapshot[`scan a basic theorem 1`] = `
     lexeme: "0",
     line: 2,
     literal: "0",
-    type: 26,
+    type: 29,
   },
   {
     char: 1,
@@ -213,7 +213,7 @@ snapshot[`scan a basic theorem 1`] = `
     char: 0,
     lexeme: "",
     line: 3,
-    type: 41,
+    type: 44,
   },
 ]
 `;
@@ -225,7 +225,7 @@ snapshot[`scan a basic main 1`] = `
     lexeme: "main",
     line: 1,
     literal: "main",
-    type: 33,
+    type: 36,
   },
   {
     char: 6,
@@ -239,7 +239,7 @@ snapshot[`scan a basic main 1`] = `
     lexeme: "print",
     line: 2,
     literal: "print",
-    type: 36,
+    type: 39,
   },
   {
     char: 8,
@@ -253,7 +253,7 @@ snapshot[`scan a basic main 1`] = `
     lexeme: '"hello, world!"',
     line: 2,
     literal: '"hello, world!"',
-    type: 25,
+    type: 28,
   },
   {
     char: 24,
@@ -280,7 +280,7 @@ snapshot[`scan a basic main 1`] = `
     char: 0,
     lexeme: "",
     line: 3,
-    type: 41,
+    type: 44,
   },
 ]
 `;
@@ -292,14 +292,14 @@ snapshot[`scan a basic const 1`] = `
     lexeme: "const",
     line: 1,
     literal: "const",
-    type: 28,
+    type: 31,
   },
   {
     char: 7,
     lexeme: "*foo*",
     line: 1,
     literal: "*foo*",
-    type: 24,
+    type: 27,
   },
   {
     char: 13,
@@ -313,7 +313,7 @@ snapshot[`scan a basic const 1`] = `
     lexeme: "1_000_000/1_000",
     line: 1,
     literal: "1000000/1000",
-    type: 26,
+    type: 29,
   },
   {
     char: 30,
@@ -326,7 +326,7 @@ snapshot[`scan a basic const 1`] = `
     char: 29,
     lexeme: "",
     line: 1,
-    type: 41,
+    type: 44,
   },
 ]
 `;
@@ -338,14 +338,14 @@ snapshot[`scan a basic struct 1`] = `
     lexeme: "struct",
     line: 1,
     literal: "struct",
-    type: 38,
+    type: 41,
   },
   {
     char: 8,
     lexeme: "foo",
     line: 1,
     literal: "foo",
-    type: 24,
+    type: 27,
   },
   {
     char: 11,
@@ -359,7 +359,7 @@ snapshot[`scan a basic struct 1`] = `
     lexeme: "x",
     line: 1,
     literal: "x",
-    type: 24,
+    type: 27,
   },
   {
     char: 13,
@@ -373,7 +373,7 @@ snapshot[`scan a basic struct 1`] = `
     lexeme: "number",
     line: 1,
     literal: "number",
-    type: 24,
+    type: 27,
   },
   {
     char: 21,
@@ -387,7 +387,7 @@ snapshot[`scan a basic struct 1`] = `
     lexeme: "y",
     line: 1,
     literal: "y",
-    type: 24,
+    type: 27,
   },
   {
     char: 24,
@@ -401,7 +401,7 @@ snapshot[`scan a basic struct 1`] = `
     lexeme: "number",
     line: 1,
     literal: "number",
-    type: 24,
+    type: 27,
   },
   {
     char: 32,
@@ -421,7 +421,7 @@ snapshot[`scan a basic struct 1`] = `
     char: 32,
     lexeme: "",
     line: 1,
-    type: 41,
+    type: 44,
   },
 ]
 `;
@@ -433,7 +433,7 @@ snapshot[`scan a basic assert 1`] = `
     lexeme: "assert",
     line: 1,
     literal: "assert",
-    type: 27,
+    type: 30,
   },
   {
     char: 7,
@@ -447,7 +447,7 @@ snapshot[`scan a basic assert 1`] = `
     lexeme: "x",
     line: 1,
     literal: "x",
-    type: 24,
+    type: 27,
   },
   {
     char: 10,
@@ -461,7 +461,7 @@ snapshot[`scan a basic assert 1`] = `
     lexeme: "0",
     line: 1,
     literal: "0",
-    type: 26,
+    type: 29,
   },
   {
     char: 13,
@@ -481,7 +481,7 @@ snapshot[`scan a basic assert 1`] = `
     char: 13,
     lexeme: "",
     line: 1,
-    type: 41,
+    type: 44,
   },
 ]
 `;
@@ -493,7 +493,7 @@ snapshot[`scan a basic print 1`] = `
     lexeme: "print",
     line: 1,
     literal: "print",
-    type: 36,
+    type: 39,
   },
   {
     char: 6,
@@ -509,7 +509,7 @@ world!"',
     line: 2,
     literal: '"hello,
 world!"',
-    type: 25,
+    type: 28,
   },
   {
     char: 22,
@@ -529,7 +529,7 @@ world!"',
     char: 22,
     lexeme: "",
     line: 2,
-    type: 41,
+    type: 44,
   },
 ]
 `;
@@ -541,14 +541,14 @@ snapshot[`scan a basic return 1`] = `
     lexeme: "return",
     line: 1,
     literal: "return",
-    type: 37,
+    type: 40,
   },
   {
     char: 8,
     lexeme: "1",
     line: 1,
     literal: "1",
-    type: 26,
+    type: 29,
   },
   {
     char: 9,
@@ -561,7 +561,7 @@ snapshot[`scan a basic return 1`] = `
     char: 8,
     lexeme: "",
     line: 1,
-    type: 41,
+    type: 44,
   },
 ]
 `;
@@ -573,7 +573,7 @@ snapshot[`scan a basic assign 1`] = `
     lexeme: "x",
     line: 1,
     literal: "x",
-    type: 24,
+    type: 27,
   },
   {
     char: 3,
@@ -587,7 +587,7 @@ snapshot[`scan a basic assign 1`] = `
     lexeme: "1",
     line: 1,
     literal: "1",
-    type: 26,
+    type: 29,
   },
   {
     char: 6,
@@ -600,7 +600,7 @@ snapshot[`scan a basic assign 1`] = `
     char: 5,
     lexeme: "",
     line: 1,
-    type: 41,
+    type: 44,
   },
 ]
 `;
@@ -630,9 +630,9 @@ snapshot[`scan some operators 1`] = `
   },
   {
     char: 10,
-    lexeme: "!",
+    lexeme: "!=",
     line: 1,
-    literal: "!",
+    literal: "!=",
     type: 16,
   },
   {
@@ -674,7 +674,7 @@ snapshot[`scan some operators 1`] = `
     char: 19,
     lexeme: "",
     line: 1,
-    type: 41,
+    type: 44,
   },
 ]
 `;
@@ -686,7 +686,7 @@ snapshot[`scan a commnet 1`] = `
     lexeme: "a",
     line: 1,
     literal: "a",
-    type: 24,
+    type: 27,
   },
   {
     char: 3,
@@ -700,7 +700,7 @@ snapshot[`scan a commnet 1`] = `
     lexeme: "1",
     line: 1,
     literal: "1",
-    type: 26,
+    type: 29,
   },
   {
     char: 6,
@@ -713,7 +713,7 @@ snapshot[`scan a commnet 1`] = `
     char: 7,
     lexeme: "",
     line: 1,
-    type: 41,
+    type: 44,
   },
 ]
 `;

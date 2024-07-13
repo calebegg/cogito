@@ -19,7 +19,7 @@ Deno.test('print a basic program', async (t) => {
           outdent`
             function foo(x: number) {
               if (x == 0) {
-                x = reduce([1, 2, 3], (x, y) => x + y, 0);
+                x = reduce([1, 2, 3], (x, y) => x + y * 2, 0);
                 return x;
               } else if (x == 1) {
                 y = [1, 2, 3, ...y];
@@ -38,7 +38,7 @@ Deno.test('print a basic program', async (t) => {
             struct foo(x: list<number>, y: number);
 
             main {
-              assert(3 > 2);
+              assert(3 > 2 -> t && nil);
               print("hi", true + false + nil == 3);
               (x, y) = foo(1);
               print("hello, ~x0!", "world");

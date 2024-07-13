@@ -2,20 +2,24 @@ export const snapshot = {};
 
 snapshot[`print a basic program 1`] = `
 \`(include-book "projects/apply/top" :dir :system)
-(defun cogito-reduce (xs fn init) (if (endp xs) init (apply\$ fn (list (first xs) (cogito-reduce (rest xs) fn init)))))
+(defun cogito-reduce (xs fn init)
+  (declare (xargs :guard (and (true-listp xs) (true-listp fn) (equal (len (cadr fn)) 2))))
+  (if (endp xs)
+    init
+    (apply\$ fn (list (first xs) (cogito-reduce (rest xs) fn init)))))
 (defwarrant cogito-reduce)
 (include-book "std/util/defaggregate" :dir :system)
 
 (defun foo (x)
   (declare (xargs :guard (and (rationalp x))))
   (if (not (and (rationalp x)))
-    0
+    nil
     (if (equal x 0)
-    (let ((x (cogito-reduce (append (list 1) (list 2) (list 3)) (lambda\$ (x y) (+ x y)) 0)))
+    (let ((x (cogito-reduce (append (list 1) (list 2) (list 3)) (lambda\$ (x y) (+ x (* y 2))) 0)))
 x)
     
     (if (equal x 1)
-    (let ((y (append (list 1) (list 2) (list 3) (list y))))
+    (let ((y (append (list 1) (list 2) (list 3) (list y)))) nil)
     (mv 1 2 3)
     (assoc 'y x)))))
 
@@ -28,8 +32,8 @@ x)
 (std::defaggregate foo
   ((x (rational-listp x)) (y (rationalp y))))
 
-(assert\$ (> 3 2)
-(prog2\$ (cw "hi~%" (+ t (+ nil (equal nil 3))))
+(assert\$ (implies (> 3 2) (and t nil))
+(prog2\$ (cw "hi~%" (equal (+ t (+ nil nil)) 3))
 (mv-let (x y) (foo 1)
-(prog2\$ (cw "hello, ~x0!~%" "world"))))\`
+(prog2\$ (cw "hello, ~x0!~%" "world") nil))))\`
 `;
