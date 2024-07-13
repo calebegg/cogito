@@ -116,6 +116,10 @@ p, ul {
 .tab {
   padding: 8px 8px 0;
   cursor: pointer;
+  appearance: none;
+  background: none;
+  border: none;
+  font: inherit;
 }
 
 .tab.current {

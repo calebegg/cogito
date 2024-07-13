@@ -40,7 +40,7 @@ export function Try({ initialSource }: { initialSource: string }) {
         });
         ws.send(lispSource.data);
         timeoutId = null;
-      }, 1000);
+      }, 2500);
     }
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
@@ -51,7 +51,7 @@ export function Try({ initialSource }: { initialSource: string }) {
 
   return (
     <div class='row-on-wide'>
-      <div style={{ paddingTop: 48, flex: 1 }}>
+      <div style={{ paddingTop: 36, flex: 1 }}>
         <CodeMirror
           initialValue={initialSource}
           onChange={(v) => setSource(v)}
@@ -59,22 +59,20 @@ export function Try({ initialSource }: { initialSource: string }) {
       </div>
       <div style={{ flex: '1' }}>
         <div style='display: flex' role='tablist'>
-          <div
+          <button
             role='tab'
             class={'tab ' + (currentTab === Tab.LISP ? 'current' : '')}
-            tabindex={0}
             onClick={() => setCurrentTab(Tab.LISP)}
           >
             Lisp source code
-          </div>
-          <div
+          </button>
+          <button
             role='tab'
             class={'tab ' + (currentTab === Tab.RAW_ACL2 ? 'current' : '')}
-            tabindex={0}
             onClick={() => setCurrentTab(Tab.RAW_ACL2)}
           >
             Raw ACL2 output
-          </div>
+          </button>
         </div>
         {currentTab === Tab.LISP
           ? (
