@@ -6,6 +6,7 @@
 
 import outdent from 'https://deno.land/x/outdent@v0.8.0/mod.ts';
 import { Try } from '../islands/Try.tsx';
+import { Star } from 'https://esm.sh/lucide-preact@0.408.0';
 
 const INTRO_SOURCE = outdent`
   function hello() {
@@ -33,6 +34,11 @@ const FEATURES_SOURCE = outdent`
 export default function Home() {
   return (
     <>
+      <header style='display: flex; justify-content: end;'>
+        <a href='https://github.com/calebegg/cogito'>
+          <Star style={{ verticalAlign: -6 }} /> on GitHub
+        </a>
+      </header>
       <div class='main-header'>
         <h1>Cogito</h1>
       </div>
