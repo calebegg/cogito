@@ -5,10 +5,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import dev from '$fresh/dev.ts';
+import config from './fresh.config.ts';
 
-import dev from "$fresh/dev.ts";
-import config from "./fresh.config.ts";
+import '$std/dotenv/load.ts';
 
-import "$std/dotenv/load.ts";
-
-await dev(import.meta.url, "./main.ts", config);
+await dev(import.meta.url, './main.ts', config);

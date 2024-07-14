@@ -40,7 +40,7 @@ export function Try({ initialSource }: { initialSource: string }) {
         });
         ws.send(lispSource.data);
         timeoutId = null;
-      }, 2500);
+      }, source == initialSource ? 0 : 2500);
     }
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
