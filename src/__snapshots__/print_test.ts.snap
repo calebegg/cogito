@@ -10,21 +10,21 @@ snapshot[`print a basic program 1`] = `
 (defwarrant cogito-reduce)
 (include-book "std/util/defaggregate" :dir :system)
 
-(defun foo (x)
-  (declare (xargs :guard (and (rationalp x))))
-  (if (not (and (rationalp x)))
+(defun foo ()
+  (declare (xargs :guard (rationalp x)))
+  (if (not (rationalp x))
     nil
     (if (equal x 0)
-    (let ((x (cogito-reduce (append (list 1) (list 2) (list 3)) (lambda\$ (x y) (+ x (* y 2))) 0)))
+    (let ((x (cogito-reduce (list 1 2 3) (lambda\$ (x y) (+ x (* y 2))) 0)))
 x)
     
     (if (equal x 1)
-    (let ((y (append (list 1) (list 2) (list 3) (list y)))) nil)
+    (let ((y (append (list 1) (list 2) (list 3) y))) nil)
     (mv 1 2 3)
     (assoc 'y x)))))
 
 (defthm |foo works|
-    (implies (and (rationalp x))
+    (implies (rationalp x)
         (> (foo x) 0)))
 
 (defconst *foo* 1)

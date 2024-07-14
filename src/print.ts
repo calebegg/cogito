@@ -16,6 +16,7 @@ import {
   Statement,
 } from './parse.ts';
 import { endsInReturn } from './check.ts';
+import { printError } from '$fresh/src/dev/error.ts';
 
 const FUNCTION_NAMES = new Map([
   ['==', 'equal'],
@@ -54,35 +55,62 @@ export function print(root: Program) {
       }
       case NodeType.MAIN:
         return printNode(root.body);
-      case NodeType.THEOREM:
+      case NodeType.THEOREM: {
+        const constraints = root.parameters.map((p) =>
+          printTypeConstraint(p, structTypes)
+        ).join(
+          ' ',
+        );
+        const body = printNode(root.body);
+        if (root.parameters.length === 0) {
+          return outdent`
+            (defthm ${root.name}
+              ${body})
+          `;
+        } else if (root.parameters.length === 1) {
+          return outdent`
+            (defthm ${root.name}
+                (implies ${constraints}
+                    ${body}))
+          `;
+        }
         return outdent`
-        (defthm ${root.name}
-            (implies (and ${
-          root.parameters.map((p) => printTypeConstraint(p, structTypes)).join(
-            ' ',
-          )
-        })
-                ${printNode(root.body)}))`;
-      case NodeType.FUNCTION:
-        // Returning 0 is...weird, but 'nil' fails (acl2-numberp return-value)
-        // and so fails most measures.
-        return outdent`
-        (defun ${root.name} (${
-          root.parameters.map((p) => printNode(p)).join(' ')
-        })
-          (declare (xargs :guard (and ${
-          root.parameters.map((p) => printTypeConstraint(p, structTypes)).join(
-            ' ',
-          )
-        })))
-          (if (not (and ${
-          root.parameters.map((p) => printTypeConstraint(p, structTypes)).join(
-            ' ',
-          )
-        }))
-            nil
-            ${printNode(root.body)}))
+          (defthm ${root.name}
+              (implies (and ${constraints})
+                  ${body}))
         `;
+      }
+      case NodeType.FUNCTION: {
+        const constraints = root.parameters.map((p) =>
+          printTypeConstraint(p, structTypes)
+        ).join(
+          ' ',
+        );
+        const params = root.parameters.map((p) => printNode(p)).join(' ');
+        const body = printNode(root.body);
+        if (root.parameters.length === 0) {
+          return outdent`
+            (defun ${root.name} ()
+              ${body})
+          `;
+        }
+        if (root.parameters.length === 1) {
+          return outdent`
+            (defun ${root.name} (${params})
+              (declare (xargs :guard ${constraints}))
+              (if (not ${constraints})
+                nil
+                ${body}))
+          `;
+        }
+        return outdent`
+        (defun ${root.name} (${params})
+          (declare (xargs :guard (and ${constraints})))
+          (if (not (and ${constraints}))
+            nil
+            ${body}))
+        `;
+      }
       case NodeType.CONST:
         return `(defconst ${root.name} ${printNode(root.value)})`;
       case NodeType.STRUCT:
@@ -204,12 +232,19 @@ export function print(root: Program) {
       case NodeType.DOT_ACCESS:
         return `(assoc '${root.right} ${printNode(root.left)})`;
       case NodeType.LIST_LITERAL:
-        // TODO: add spread
+        if (root.contents.every((c) => c.type !== NodeType.SPREAD)) {
+          return `(list ${root.contents.map((c) => printNode(c)).join(' ')})`;
+        }
         return `(append ${
-          root.contents.map((c) => `(list ${printNode(c)})`).join(' ')
+          root.contents.map((c) => {
+            if (c.type === NodeType.SPREAD) {
+              return printNode(c.value);
+            }
+            return `(list ${printNode(c)})`;
+          }).join(' ')
         })`;
       case NodeType.SPREAD:
-        return printNode(root.value);
+        throw printError("Can't use the spread operator here.");
       case NodeType.IF:
         throw new Error("Not callable with expressions of type 'IF'");
       case NodeType.ELSE:
