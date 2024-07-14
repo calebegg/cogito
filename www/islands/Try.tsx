@@ -38,7 +38,13 @@ export function Try({ initialSource }: { initialSource: string }) {
         ws.addEventListener('error', () => {
           setOutput((o) => [...o, 'Unexpected socket error']);
         });
-        ws.send(lispSource.data);
+        if (ws.readyState === WebSocket.CONNECTING) {
+          ws.addEventListener('open', () => {
+            ws.send(lispSource.data);
+          });
+        } else {
+          ws.send(lispSource.data);
+        }
         timeoutId = null;
       }, source == initialSource ? 0 : 2500);
     }
