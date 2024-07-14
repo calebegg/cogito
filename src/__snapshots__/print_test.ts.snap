@@ -10,7 +10,7 @@ snapshot[`print a basic program 1`] = `
 (defwarrant cogito-reduce)
 (include-book "std/util/defaggregate" :dir :system)
 
-(defun foo ()
+(defun foo (x)
   (declare (xargs :guard (rationalp x)))
   (if (not (rationalp x))
     nil

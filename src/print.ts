@@ -136,6 +136,9 @@ export function print(root: Program) {
         ) {
           rest = ' nil)';
         }
+        if (root.contents.type === NodeType.FUNCTION_CALL) {
+          return `(prog2$ ${printNode(root.contents)} ${rest}`;
+        }
         return printNode(root.contents) + rest;
       }
       case NodeType.PRINT:

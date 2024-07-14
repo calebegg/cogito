@@ -21,6 +21,7 @@ export function endsInReturn(root: Statement | If | Else | null): boolean {
         case NodeType.ASSIGN:
         case NodeType.TUPLE_ASSIGN:
         case NodeType.PRINT:
+        case NodeType.FUNCTION_CALL:
           return endsInReturn(root.rest);
         case NodeType.IF:
           return endsInReturn(root.rest) || endsInReturn(root.contents);

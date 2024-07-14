@@ -31,7 +31,7 @@ export function Try({ initialSource }: { initialSource: string }) {
     setError(false);
     const lispSource = process(source);
     let timeoutId: number | null = null;
-    const ws = new WebSocket(`wss://acl2-jbhe53iwqa-uc.a.run.app/acl2`);
+    let ws: WebSocket | null = null;
     setLisp(lispSource.data);
     if (lispSource.status === 'error') {
       setError(true);
@@ -39,6 +39,7 @@ export function Try({ initialSource }: { initialSource: string }) {
     } else {
       setOutput([]);
       timeoutId = setTimeout(() => {
+        ws = new WebSocket(`wss://acl2-jbhe53iwqa-uc.a.run.app/acl2`);
         ws.addEventListener('message', ({ data }) => {
           setOutput((o) => [...o, data]);
         });
@@ -47,7 +48,7 @@ export function Try({ initialSource }: { initialSource: string }) {
         });
         if (ws.readyState === WebSocket.CONNECTING) {
           ws.addEventListener('open', () => {
-            ws.send(lispSource.data);
+            ws!.send(lispSource.data);
           });
         } else {
           ws.send(lispSource.data);
@@ -57,7 +58,7 @@ export function Try({ initialSource }: { initialSource: string }) {
     }
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
-      if (ws.readyState === WebSocket.OPEN) ws.close();
+      if (ws && ws.readyState === WebSocket.OPEN) ws.close();
       setOutput([]);
     };
   }, [source]);

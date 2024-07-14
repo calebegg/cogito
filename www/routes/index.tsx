@@ -12,6 +12,10 @@ const INTRO_SOURCE = outdent`
   function hello() {
     print("Hello, world!");
   }
+
+  main {
+    hello();
+  }
 `;
 
 const FEATURES_SOURCE = outdent`

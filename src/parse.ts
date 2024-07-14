@@ -14,7 +14,6 @@ export enum NodeType {
   CONST,
   DOT_ACCESS,
   ELSE,
-  EXPR,
   FUNCTION_CALL,
   FUNCTION,
   IF,
@@ -87,7 +86,15 @@ export interface Parameter extends NodeMixin<NodeType.PARAMETER> {
 }
 
 export interface Statement extends NodeMixin<NodeType.STATEMENT> {
-  contents: Print | Assign | TupleAssign | Assert | Return | If | Else;
+  contents:
+    | Print
+    | Assign
+    | TupleAssign
+    | Assert
+    | Return
+    | If
+    | Else
+    | FunctionCall;
   rest: Statement | null;
 }
 
@@ -311,7 +318,7 @@ export function parse(tokens: Token[]) {
     return expect(TokenType.IDENTIFIER).lexeme;
   }
 
-  // statement -> print | assign | return | if
+  // statement -> print | assign | return | if | expr
   function parseStatement(): Statement {
     let contents: Statement['contents'];
     switch (tokens[current].type) {
@@ -321,7 +328,24 @@ export function parse(tokens: Token[]) {
       case TokenType.ASSERT:
         contents = parseAssert();
         break;
-      case TokenType.IDENTIFIER:
+      case TokenType.IDENTIFIER: {
+        if (tokens[current + 1].type === TokenType.EQUAL) {
+          contents = parseAssign();
+        } else {
+          const expr = parseExpr();
+          expect(TokenType.SEMICOLON);
+          if (expr.type === NodeType.FUNCTION_CALL) {
+            contents = expr;
+          } else {
+            throw errorWhileParsing(
+              `Unexpected expression of type ${
+                NodeType[expr.type]
+              }. Assign to a variable or return it.`,
+            );
+          }
+        }
+        break;
+      }
       case TokenType.LEFT_PAREN:
         contents = parseAssign();
         break;
