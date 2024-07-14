@@ -7,16 +7,23 @@
 import { useEffect, useState } from 'preact/hooks';
 import { process } from '../../src/index.ts';
 import { CodeMirror } from '../components/CodeMirror.tsx';
+import {
+  CircleCheck,
+  CircleDot,
+  CircleX,
+  LoaderCircle,
+} from 'https://esm.sh/lucide-preact@0.408.0';
 
 enum Tab {
   LISP,
+  ACL2_SUMMARY,
   RAW_ACL2,
 }
 
 export function Try({ initialSource }: { initialSource: string }) {
   const [output, setOutput] = useState<string[]>([]);
   const [lisp, setLisp] = useState('');
-  const [currentTab, setCurrentTab] = useState(Tab.RAW_ACL2);
+  const [currentTab, setCurrentTab] = useState(Tab.ACL2_SUMMARY);
   const [source, setSource] = useState(initialSource);
   const [error, setError] = useState(false);
 
@@ -74,6 +81,13 @@ export function Try({ initialSource }: { initialSource: string }) {
           </button>
           <button
             role='tab'
+            class={'tab ' + (currentTab === Tab.ACL2_SUMMARY ? 'current' : '')}
+            onClick={() => setCurrentTab(Tab.ACL2_SUMMARY)}
+          >
+            ACL2 summary
+          </button>
+          <button
+            role='tab'
             class={'tab ' + (currentTab === Tab.RAW_ACL2 ? 'current' : '')}
             onClick={() => setCurrentTab(Tab.RAW_ACL2)}
           >
@@ -88,6 +102,62 @@ export function Try({ initialSource }: { initialSource: string }) {
               class={error ? 'error' : ''}
             >{lisp}</pre>
           )
+          : currentTab === Tab.ACL2_SUMMARY
+          ? (
+            <div
+              role='tabpanel'
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 16,
+                padding: 16,
+                border: 'solid #888 1px',
+              }}
+            >
+              {output.length === 0
+                ? (
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      paddingTop: 32,
+                      paddingBottom: 32,
+                    }}
+                  >
+                    <LoaderCircle />
+                  </div>
+                )
+                : output.map((o) => summarize(o)).filter((s): s is Summary =>
+                  s != null
+                ).map(
+                  (s) => (
+                    <div>
+                      {s.state === 'success'
+                        ? (
+                          <CircleCheck
+                            color='green'
+                            style={{ verticalAlign: -6, marginRight: 16 }}
+                          />
+                        )
+                        : s.state === 'text'
+                        ? (
+                          <CircleDot
+                            color='#888'
+                            style={{ verticalAlign: -6, marginRight: 16 }}
+                          />
+                        )
+                        : (
+                          <CircleX
+                            color='red'
+                            style={{ verticalAlign: -6, marginRight: 16 }}
+                          />
+                        )}
+                      {s.message}
+                    </div>
+                  ),
+                )}
+            </div>
+          )
           : (
             <div role='tabpanel' style={{ overflow: 'auto', maxHeight: 400 }}>
               {output.map((o) => (
@@ -101,4 +171,37 @@ export function Try({ initialSource }: { initialSource: string }) {
       </div>
     </div>
   );
+}
+
+interface Summary {
+  state: 'success' | 'failure' | 'text';
+  message: string;
+}
+
+function summarize(output: string): Summary | null {
+  if (!output) return null;
+  const state: Summary['state'] = [
+      '************ ABORTING from raw Lisp ***********',
+      '******** FAILED ********',
+      'HARD ACL2 ERROR',
+      'ACL2 Error',
+      'Parse error',
+    ].some((m) => output.includes(m))
+    ? 'failure'
+    : 'success';
+  const match = output.match(
+    new RegExp(`Summary
+Form:\\s+\\( (\\w*) (.*) \\.\\.\\.\\)`),
+  );
+  if (!match) {
+    return {
+      state: state === 'success' ? 'text' : state,
+      message: output.substring(0, 80) + (output.length > 80 ? '...' : ''),
+    };
+  } else if (match[1] === 'DEFUN') {
+    return { state, message: `Admission of ${match[2]}` };
+  } else if (match[1] === 'DEFTHM') {
+    return { state, message: `Proof of ${match[2]}` };
+  }
+  return { state, message: 'Unknown response' };
 }
