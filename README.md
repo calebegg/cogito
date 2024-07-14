@@ -1,40 +1,4 @@
-# Cogito (working title)
-
-## How to read this document
-
-- [I'm an ACL2 expert](#background-for-acl2-experts)
-- [I'm an experienced developer](#more-details)
-- [I'm a total novice, but I'm here to learn](#basic-introduction)
-
-## Basic introduction
-
-Cogito is a small, simple, and expressive programming language that uses the
-[ACL2 theorem prover](https://www.cs.utexas.edu/~moore/acl2/) to execute
-functions and prove theorems. Its familiar C-like syntax enforces the
-constraints of ACL2 automatically.
-
-Compared to writing raw ACL2, Cogito presents:
-
-- A C-like syntax that's easy to learn and more familiar to most programmers
-- A straightforward way to print debugging information
-- The ability to easily define local variables without deep nesting
-- TypeScript-style parameter types for functions and theorems that set up total
-  functions and sane theorems without extra effort
-- Global functions for common list operations like `map`, `flatMap`, `reduce`,
-  `filter`, and `zipWith`
-
-## More details
-
-Cogito may superficially look like any other C-like language. But the extra
-constraints that the syntax enforces actually allow code to be interpreted by
-the sophisticated automatic ACL2 theorem prover, which can provide much more
-confidence in your code compared to unit tests.
-
-The intent of Cogito is to be a gentle way to access ACL2's power, specifically
-through the lens of a teaching language for students unfamiliar with functional
-programming languages. Through its syntax, Cogito provides basic **guard rails**
-to make sure that the user is writing code that is more likely to succeed in
-proof attempts without as much cognitive overhead.
+# [Cogito](https://cogitolang.org)
 
 ## Examples
 
