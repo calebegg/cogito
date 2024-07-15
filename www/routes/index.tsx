@@ -30,8 +30,12 @@ const FEATURES_SOURCE = outdent`
     return y;
   }
 
-  theorem |foo increases|(x: number) {
-    return foo(x) > x;
+  function sum(l: list<number>) {
+    return reduce(l, (x, y) => x + y, 0);
+  }
+  
+  theorem |sum distributes over append|(l: list<number>, m: list<number>) {
+    return sum(l) + sum(m) == sum([...l, ...m]);
   }
 `;
 

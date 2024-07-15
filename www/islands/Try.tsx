@@ -190,6 +190,8 @@ function summarize(output: string): Summary | null {
     ].some((m) => output.includes(m))
     ? 'failure'
     : 'success';
+
+  if (output.includes('APPLY$-WARRANT-COGITO-')) return null;
   const summaryMatch = output.match(
     new RegExp(`Summary
 Form:\\s+\\( ([A-Z:-]+) (.*) \\.\\.\\.\\)`),
@@ -200,15 +202,15 @@ Form:\\s+\\( ([A-Z:-]+) (.*) \\.\\.\\.\\)`),
       state: state === 'success' ? 'text' : state,
       message: output.substring(0, 80) + (output.length > 80 ? '...' : ''),
     };
+  } else if (
+    summaryMatch[1] === 'INCLUDE-BOOK' ||
+    summaryMatch[2].startsWith('COGITO-')
+  ) {
+    return null;
   } else if (summaryMatch[1] === 'DEFUN') {
     return { state, message: `Admission of ${summaryMatch[2]}` };
   } else if (summaryMatch[1] === 'DEFTHM') {
     return { state, message: `Proof of ${summaryMatch[2]}` };
-  } else if (
-    summaryMatch[1] === 'INCLUDE-BOOK' || summaryMatch[1] === 'DEFWARRANT' ||
-    summaryMatch[2].startsWith('COGITO')
-  ) {
-    return null;
   } else if (structMatch) {
     return { state, message: `Generating struct ${structMatch[1]}` };
   } else if (output.includes('Assertion failed')) {
