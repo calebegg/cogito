@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/hook.sh"
+
+~/.deno/bin/deno fmt --check
+~/.deno/bin/deno test --allow-read
+~/.deno/bin/deno lint
