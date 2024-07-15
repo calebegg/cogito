@@ -190,19 +190,29 @@ function summarize(output: string): Summary | null {
     ].some((m) => output.includes(m))
     ? 'failure'
     : 'success';
-  const match = output.match(
+  const summaryMatch = output.match(
     new RegExp(`Summary
-Form:\\s+\\( (\\w*) (.*) \\.\\.\\.\\)`),
+Form:\\s+\\( ([A-Z:-]+) (.*) \\.\\.\\.\\)`),
   );
-  if (!match) {
+  const structMatch = output.match(/\(STD::DEFAGGREGATE ([A-Z:-]+)\)$/);
+  if (!summaryMatch) {
     return {
       state: state === 'success' ? 'text' : state,
       message: output.substring(0, 80) + (output.length > 80 ? '...' : ''),
     };
-  } else if (match[1] === 'DEFUN') {
-    return { state, message: `Admission of ${match[2]}` };
-  } else if (match[1] === 'DEFTHM') {
-    return { state, message: `Proof of ${match[2]}` };
+  } else if (summaryMatch[1] === 'DEFUN') {
+    return { state, message: `Admission of ${summaryMatch[2]}` };
+  } else if (summaryMatch[1] === 'DEFTHM') {
+    return { state, message: `Proof of ${summaryMatch[2]}` };
+  } else if (
+    summaryMatch[1] === 'INCLUDE-BOOK' || summaryMatch[1] === 'DEFWARRANT' ||
+    summaryMatch[2].startsWith('COGITO')
+  ) {
+    return null;
+  } else if (structMatch) {
+    return { state, message: `Generating struct ${structMatch[1]}` };
+  } else if (output.includes('Assertion failed')) {
+    return { state, message: 'Assertion failed' };
   }
   return { state, message: 'Unknown response' };
 }
