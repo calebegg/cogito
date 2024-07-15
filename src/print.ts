@@ -185,7 +185,7 @@ export function print(root: Program) {
                   (declare (xargs :guard (and (true-listp xs) (true-listp fn) (equal (len (cadr fn)) 1))))
                   (if (endp xs)
                     xs
-                    (cons (apply$ fn (list (first xs))) (cogito-map (rest xs) fn)))))
+                    (cons (apply$ fn (list (first xs))) (cogito-map (rest xs) fn))))
               `,
             );
             addFrontMatter('(defwarrant cogito-map)');
