@@ -35,7 +35,7 @@ const FEATURES_SOURCE = outdent`
   }
   
   theorem |sum distributes over append|(l: list<number>, m: list<number>) {
-    return sum(l) + sum(m) == sum([...l, ...m]);
+    return sum([...l, ...m]) == sum(l) + sum(m);
   }
 `;
 
