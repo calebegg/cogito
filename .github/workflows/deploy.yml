@@ -31,4 +31,4 @@ jobs:
         with:
           project: "cogito"
           entrypoint: "main.ts"
-          root: "www/_fresh"
+          root: "www/"
