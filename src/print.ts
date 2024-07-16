@@ -16,7 +16,6 @@ import {
   Statement,
 } from './parse.ts';
 import { endsInReturn } from './check.ts';
-import { printError } from '$fresh/src/dev/error.ts';
 
 const FUNCTION_NAMES = new Map([
   ['==', 'equal'],
@@ -247,7 +246,8 @@ export function print(root: Program) {
           }).join(' ')
         })`;
       case NodeType.SPREAD:
-        throw printError("Can't use the spread operator here.");
+        // TODO: Fill in line, char
+        throw error(-1, -1, "Can't use the spread operator here.");
       case NodeType.IF:
         throw new Error("Not callable with expressions of type 'IF'");
       case NodeType.ELSE:
