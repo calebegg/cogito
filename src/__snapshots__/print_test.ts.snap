@@ -33,7 +33,7 @@ x)
   ((x (rational-listp x)) (y (rationalp y))))
 
 (assert\$ (implies (> 3 2) (and t nil))
-(prog2\$ (cw "hi~%" (equal (+ t (+ nil nil)) 3))
+(prog2\$ (cw "hi~%" (equal (+ (+ t nil) nil) 3))
 (mv-let (x y) (foo 1)
 (prog2\$ (cw "hello, ~x0!~%" "world") nil))))\`
 `;

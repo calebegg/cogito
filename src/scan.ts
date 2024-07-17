@@ -37,6 +37,7 @@ export enum TokenType {
   SKINNY_ARROW,
   AMP_AMP,
   PIPE_PIPE,
+  STAR_STAR,
 
   // Literals
   IDENTIFIER,
@@ -272,7 +273,11 @@ export function scan(source: string): Token[] {
         }
         if (c.match(/[a-zA-Z_*]/)) {
           if (c === '*' && !source.charAt(current).match(/[a-zA-Z0-9_<>-]/)) {
-            addToken(TokenType.STAR);
+            if (source.charAt(current + 1) === '*') {
+              addToken(TokenType.STAR_STAR);
+            } else {
+              addToken(TokenType.STAR);
+            }
             continue;
           }
           while (source.charAt(current).match(/[a-zA-Z0-9_*<>-]/)) {

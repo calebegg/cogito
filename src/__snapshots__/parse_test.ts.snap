@@ -103,22 +103,22 @@ snapshot[`parse a basic program 1`] = `
                       {
                         args: [
                           {
-                            type: 18,
-                            value: "1",
-                          },
-                          {
                             args: [
+                              {
+                                type: 18,
+                                value: "1",
+                              },
                               {
                                 type: 18,
                                 value: "x",
                               },
-                              {
-                                type: 18,
-                                value: '"hello"',
-                              },
                             ],
                             name: "+",
                             type: 5,
+                          },
+                          {
+                            type: 18,
+                            value: '"hello"',
                           },
                         ],
                         name: "+",
@@ -137,25 +137,25 @@ snapshot[`parse a basic program 1`] = `
                                   {
                                     args: [
                                       {
-                                        type: 18,
-                                        value: "3",
-                                      },
-                                      {
                                         args: [
+                                          {
+                                            type: 18,
+                                            value: "3",
+                                          },
                                           {
                                             type: 18,
                                             value: "false",
                                           },
-                                          {
-                                            type: 18,
-                                            value: "nil",
-                                          },
                                         ],
-                                        name: ">=",
+                                        name: "<",
                                         type: 5,
                                       },
+                                      {
+                                        type: 18,
+                                        value: "nil",
+                                      },
                                     ],
-                                    name: "<",
+                                    name: ">=",
                                     type: 5,
                                   },
                                 ],
