@@ -51,6 +51,7 @@ export function CodeMirror({
         closeBrackets(),
         autocompletion(),
         highlightActiveLine(),
+        // cogito(),
         keymap.of([
           ...closeBracketsKeymap,
           ...defaultKeymap,
@@ -84,3 +85,25 @@ export function CodeMirror({
     </div>
   );
 }
+
+// const cogitoLanguage = LRLanguage.define({
+//   parser: parser.configure({
+//     props: [
+//       styleTags({
+//         '( )': tags.paren,
+//         Keyword: tags.keyword,
+//       }),
+//     ],
+//   }),
+//   languageData: {
+//     commentTokens: { line: '//' },
+//   },
+// });
+
+// function cogito() {
+//   return new LanguageSupport(cogitoLanguage, [
+//     cogitoLanguage.data.of({
+//       closeBrackets: { brackets: ['(', '[', '{', '<', '"'] },
+//     }),
+//   ]);
+// }

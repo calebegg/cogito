@@ -19,7 +19,7 @@ snapshot[`print a basic program 1`] = `
 x)
     
     (if (equal x 1)
-    (let ((y (append (list 1) (list 2) (list 3) y))) nil)
+    (let ((y (append (list 1) (list (expt 2 3)) (list 3) y))) nil)
     (mv 1 2 3)
     (assoc 'y x)))))
 

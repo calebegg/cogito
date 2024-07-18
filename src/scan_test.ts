@@ -120,7 +120,7 @@ Deno.test('scan some operators', async (t) => {
     t,
     scan(
       outdent`
-        == >= <= != < > = .;
+        == >= <= != < > = . * / + - **;
       `,
     ),
   );

@@ -1,0 +1,63 @@
+@top Program { declaration* }
+
+declaration {
+  function | theorem | struct
+}
+
+function { 
+  @specialize<ID, 'function'> ID '(' paramList ')' '{' statement* '}'
+}
+
+theorem {
+  @specialize<ID, 'thoerem'> ID '(' paramList ')' '{' statement* '}'
+}
+
+struct {
+  @specialize<ID, 'struct'> ID paramList
+}
+
+paramList {
+   ( ID ':' type ( ',' ID ':' type )* ','? )?
+}
+
+type {
+  ID ( '<' type ( ',' type )* ','? '>' )?
+}
+
+statement {
+  ( assignment | expression ) ';'
+}
+
+assignment {
+  ID '=' expression
+}
+
+@precedence {
+  star @left,
+  slash @left,
+  plus @left,
+  minus @left,
+  equals @left,
+  dot @left,
+  starStar @right
+}
+
+expression {
+  ID ( '(' expression ( ',' expression )* ','? ')' )?
+  | number
+  | '(' expression ')'
+  | expression !plus '+' expression
+  | expression !minus '-' expression
+  | expression !star '*' expression
+  | expression !slash '/' expression
+}
+
+@skip { space | Comment }
+
+@tokens {
+  ID { @asciiLetter+ }
+  number { @digit+ }
+  space { @whitespace+ }
+  Comment { "//" ![\n]* }
+  @precedence { Comment, '/' }
+}

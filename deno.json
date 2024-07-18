@@ -17,7 +17,8 @@
     "@codemirror/": "https://esm.sh/@codemirror/",
     "@preact/signals": "https://esm.sh/*@preact/signals@1.2.2",
     "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.1",
-    "$std/": "https://deno.land/std@0.216.0/"
+    "$std/": "https://deno.land/std@0.216.0/",
+    "@lezer/lr": "https://esm.sh/@lezer/lr@1.4.0"
   },
   "tasks": {
     "test": "deno test --allow-all",
@@ -27,7 +28,11 @@
     "hook": "deno run --allow-read --allow-run --allow-write https://deno.land/x/deno_hooks@0.1.1/mod.ts"
   },
   "fmt": {
-    "singleQuote": true
+    "singleQuote": true,
+    "exclude": [
+      "www/components/cogito.grammar.js",
+      "www/components/cogito.grammar.terms.js"
+    ]
   },
   "compilerOptions": {
     "jsx": "react-jsx",

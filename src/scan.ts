@@ -273,7 +273,8 @@ export function scan(source: string): Token[] {
         }
         if (c.match(/[a-zA-Z_*]/)) {
           if (c === '*' && !source.charAt(current).match(/[a-zA-Z0-9_<>-]/)) {
-            if (source.charAt(current + 1) === '*') {
+            if (source.charAt(current) === '*') {
+              current++;
               addToken(TokenType.STAR_STAR);
             } else {
               addToken(TokenType.STAR);

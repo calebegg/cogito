@@ -28,6 +28,7 @@ const FUNCTION_NAMES = new Map([
   ['&&', 'and'],
   ['||', 'or'],
   ['->', 'implies'],
+  ['**', 'expt'],
 ]);
 
 export function print(root: Program) {
@@ -184,7 +185,9 @@ export function print(root: Program) {
                   (declare (xargs :guard (and (true-listp xs) (true-listp fn) (equal (len (cadr fn)) 1))))
                   (if (endp xs)
                     xs
-                    (cons (apply$ fn (list (first xs))) (cogito-map (rest xs) fn))))
+                    (cons
+                      (apply$ fn (list (first xs)))
+                      (cogito-map (rest xs) fn))))
               `,
             );
             addFrontMatter('(defwarrant cogito-map)');
@@ -195,7 +198,11 @@ export function print(root: Program) {
               outdent`
                 (defun cogito-flat-map (xs fn)
                   (declare (xargs :guard (and (true-listp xs) (true-listp fn) (equal (len (cadr fn)) 1))))
-                  (if (endp xs) xs (append (apply$ fn (list (first xs))) (cogito-flat-map (rest xs) fn)))))
+                  (if (endp xs)
+                    xs
+                    (append
+                      (apply$ fn (list (first xs)))
+                      (cogito-flat-map (rest xs) fn)))))
               `,
             );
             addFrontMatter('(defwarrant cogito-flat-map)');
@@ -234,6 +241,9 @@ export function print(root: Program) {
       case NodeType.DOT_ACCESS:
         return `(assoc '${root.right} ${printNode(root.left)})`;
       case NodeType.LIST_LITERAL:
+        if (root.contents.length === 0) {
+          return 'nil';
+        }
         if (root.contents.every((c) => c.type !== NodeType.SPREAD)) {
           return `(list ${root.contents.map((c) => printNode(c)).join(' ')})`;
         }

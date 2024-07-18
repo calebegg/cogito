@@ -22,7 +22,7 @@ Deno.test('print a basic program', async (t) => {
                 x = reduce([1, 2, 3], (x, y) => x + y * 2, 0);
                 return x;
               } else if (x == 1) {
-                y = [1, 2, 3, ...y];
+                y = [1, 2 ** 3, 3, ...y];
               } else {
                 return x.y;
               }
