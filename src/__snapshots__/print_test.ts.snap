@@ -37,3 +37,16 @@ x)
 (mv-let (x y) (foo 1)
 (prog2\$ (cw "hello, ~x0!~%" "world") nil))))\`
 `;
+
+snapshot[`works with struct types 1`] = `
+\`(include-book "std/util/defaggregate" :dir :system)
+
+(std::defaggregate point
+  ((x (rationalp x)) (y (rationalp y))))
+
+(defun foo (p)
+  (declare (xargs :guard (point-p p)))
+  (if (not (point-p p))
+    nil
+    (+ (assoc 'x p) (assoc 'y p))))\`
+`;

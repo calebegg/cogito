@@ -49,3 +49,22 @@ Deno.test('print a basic program', async (t) => {
     ),
   );
 });
+
+Deno.test('works with struct types', async (t) => {
+  await assertSnapshot(
+    t,
+    print(
+      parse(
+        scan(
+          outdent`
+            struct point(x: number, y: number);
+
+            function foo(p: point) {
+              return p.x + p.y;
+            }
+          `,
+        ),
+      ),
+    ),
+  );
+});

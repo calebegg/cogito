@@ -5,23 +5,30 @@ declaration {
 }
 
 function { 
-  @specialize<ID, 'function'> ID '(' paramList ')' '{' statement* '}'
+  @specialize<identifier, 'function'> identifier '(' paramList ')' '{' statement* '}'
 }
 
 theorem {
-  @specialize<ID, 'thoerem'> ID '(' paramList ')' '{' statement* '}'
+  @specialize<identifier, 'theorem'> identifier '(' paramList ')' '{' statement* '}'
 }
 
 struct {
-  @specialize<ID, 'struct'> ID paramList
+  @specialize<identifier, 'struct'> identifier paramList
+}
+
+keyword {
+  @specialize<identifier, 'struct'>
+  | @specialize<identifier, 'theorem'>
+  | @specialize<identifier, 'function'>
+  | @specialize<identifier, 'mutual'>
 }
 
 paramList {
-   ( ID ':' type ( ',' ID ':' type )* ','? )?
+   ( identifier ':' type ( ',' identifier ':' type )* ','? )?
 }
 
 type {
-  ID ( '<' type ( ',' type )* ','? '>' )?
+  identifier ( '<' type ( ',' type )* ','? '>' )?
 }
 
 statement {
@@ -29,7 +36,7 @@ statement {
 }
 
 assignment {
-  ID '=' expression
+  identifier '=' expression
 }
 
 @precedence {
@@ -43,19 +50,22 @@ assignment {
 }
 
 expression {
-  ID ( '(' expression ( ',' expression )* ','? ')' )?
+  identifier '(' expression ( ',' expression )* ','? ')'
   | number
   | '(' expression ')'
   | expression !plus '+' expression
   | expression !minus '-' expression
   | expression !star '*' expression
   | expression !slash '/' expression
+  | expression !equals '==' expression
+  | expression !dot '.' expression
+  | expression !starStar '**' expression
 }
 
 @skip { space | Comment }
 
 @tokens {
-  ID { @asciiLetter+ }
+  identifier { @asciiLetter+ }
   number { @digit+ }
   space { @whitespace+ }
   Comment { "//" ![\n]* }

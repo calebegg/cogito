@@ -48,10 +48,10 @@ export function Try({ initialSource }: { initialSource: string }) {
         });
         if (ws.readyState === WebSocket.CONNECTING) {
           ws.addEventListener('open', () => {
-            ws!.send(lispSource.data);
+            ws!.send('(set-guard-checking :nowarn) ' + lispSource.data);
           });
         } else {
-          ws.send(lispSource.data);
+          ws.send('(set-guard-checking :nowarn) ' + lispSource.data);
         }
         timeoutId = null;
       }, source == initialSource ? 0 : 2500);
@@ -161,7 +161,7 @@ export function Try({ initialSource }: { initialSource: string }) {
           )
           : (
             <div role='tabpanel' style={{ overflow: 'auto', maxHeight: 400 }}>
-              {output.map((o) => (
+              {output.filter((o) => o.length > 0).map((o) => (
                 <>
                   <pre>{o}</pre>
                   <hr />
@@ -181,6 +181,9 @@ interface Summary {
 
 function summarize(output: string): Summary | null {
   if (!output) return null;
+  if (output === 'Leaving guard checking on, but changing value to :NOWARN.') {
+    return null;
+  }
   const state: Summary['state'] = [
       '************ ABORTING from raw Lisp ***********',
       '******** FAILED ********',
@@ -211,6 +214,8 @@ Form:\\s+\\( ([A-Z:-]+) (.*) \\.\\.\\.\\)`),
     return { state, message: `Admission of ${summaryMatch[2]}` };
   } else if (summaryMatch[1] === 'DEFTHM') {
     return { state, message: `Proof of ${summaryMatch[2]}` };
+  } else if (summaryMatch[1] === 'MUTUAL-RECURSION') {
+    return { state, message: `Admission of mutually recursive functions` };
   } else if (structMatch) {
     return { state, message: `Generating struct ${structMatch[1]}` };
   } else if (output.includes('Assertion failed')) {

@@ -63,11 +63,6 @@ export default function Home() {
       </section>
       <section>
         <div class='header'>
-          <h2></h2>
-        </div>
-      </section>
-      <section>
-        <div class='header'>
           <h2>Features</h2>
         </div>
         <ul>
@@ -103,6 +98,11 @@ export default function Home() {
             programming, and the ACL2 ecosystem.
           </li>
         </ul>
+        <p>
+          <a href='advanced'>
+            Read more about Cogito's advanced features here.
+          </a>
+        </p>
         <Try initialSource={FEATURES_SOURCE} />
       </section>
       <section>

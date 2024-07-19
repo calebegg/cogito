@@ -29,10 +29,12 @@ const FUNCTION_NAMES = new Map([
   ['||', 'or'],
   ['->', 'implies'],
   ['**', 'expt'],
+  ['is-even', 'evenp'],
 ]);
 
 export function print(root: Program) {
   const frontMatter: string[] = [];
+  const structTypes: string[] = [];
   return printNode(root);
 
   function addFrontMatter(fm: string) {
@@ -42,8 +44,6 @@ export function print(root: Program) {
   }
 
   function printNode(root: Node): string {
-    const structTypes: string[] = [];
-
     switch (root.type) {
       case NodeType.PROGRAM: {
         const progOut = root.declarations.map((d) => printNode(d)).join('\n\n');
@@ -55,6 +55,12 @@ export function print(root: Program) {
       }
       case NodeType.MAIN:
         return printNode(root.body);
+      case NodeType.MUTUAL:
+        return outdent`
+          (mutual-recursion
+            ${root.functions.map((f) => printNode(f)).join('\n\n')}
+          )
+        `;
       case NodeType.THEOREM: {
         const constraints = root.parameters.map((p) =>
           printTypeConstraint(p, structTypes)
@@ -202,7 +208,7 @@ export function print(root: Program) {
                     xs
                     (append
                       (apply$ fn (list (first xs)))
-                      (cogito-flat-map (rest xs) fn)))))
+                      (cogito-flat-map (rest xs) fn))))
               `,
             );
             addFrontMatter('(defwarrant cogito-flat-map)');
@@ -230,7 +236,7 @@ export function print(root: Program) {
                   (if (or (endp xs) (endp ys))
                     nil
                     (cons (apply$ fn (list (first xs) (first ys)))
-                          (cogito-zip-with (rest xs) (rest ys) fn)))))
+                          (cogito-zip-with (rest xs) (rest ys) fn))))
               `,
             );
             addFrontMatter('(defwarrant cogito-zip-with)');

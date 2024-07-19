@@ -7,22 +7,26 @@
 import { assert } from 'https://deno.land/std@0.207.0/assert/mod.ts';
 import { scan } from './scan.ts';
 import outdent from 'https://deno.land/x/outdent@v0.8.0/mod.ts';
-import { NodeType, Program } from './parse.ts';
+import { Declaration, NodeType, Program } from './parse.ts';
 import { parse } from './parse.ts';
 import { endsInReturn } from './check.ts';
 
-function getFirstBody(p: Program) {
-  const firstDeclaration = p.declarations[0];
-  switch (firstDeclaration.type) {
+function getFirstBody(node: Program | Declaration) {
+  if (node.type === NodeType.PROGRAM) {
+    node = node.declarations[0];
+  }
+  switch (node.type) {
+    case NodeType.MUTUAL:
+      return getFirstBody(node.functions[0]);
     case NodeType.FUNCTION:
     case NodeType.THEOREM:
     case NodeType.MAIN:
-      return firstDeclaration.body;
+      return node.body;
     case NodeType.CONST:
     case NodeType.STRUCT:
       throw new Error('No body');
     default:
-      firstDeclaration satisfies never;
+      node satisfies never;
       throw new Error('Unreachable');
   }
 }

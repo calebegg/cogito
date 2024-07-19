@@ -20,6 +20,7 @@ export enum NodeType {
   LAMBDA,
   LIST_LITERAL,
   MAIN,
+  MUTUAL,
   PARAMETER,
   PRINT,
   PROGRAM,
@@ -49,7 +50,7 @@ export interface Program extends NodeMixin<NodeType.PROGRAM> {
   declarations: Declaration[];
 }
 
-type Declaration = Function | Theorem | Const | Struct | Main;
+export type Declaration = Function | Theorem | Const | Struct | Main | Mutual;
 
 interface Main extends NodeMixin<NodeType.MAIN> {
   body: Statement;
@@ -76,6 +77,10 @@ interface Const extends NodeMixin<NodeType.CONST> {
 interface Struct extends NodeMixin<NodeType.STRUCT> {
   name: string;
   parameters: Parameter[];
+}
+
+interface Mutual extends NodeMixin<NodeType.MUTUAL> {
+  functions: Function[];
 }
 
 export interface Parameter extends NodeMixin<NodeType.PARAMETER> {
@@ -209,6 +214,18 @@ export function parse(tokens: Token[]) {
       return parseStruct();
     } else if (tokens[current].type === TokenType.MAIN) {
       return parseMain();
+    } else if (tokens[current].type === TokenType.MUTUAL) {
+      const functions = [];
+      expect(TokenType.MUTUAL);
+      expect(TokenType.LEFT_BRACE);
+      while (tokens[current].type === TokenType.FUNCTION) {
+        functions.push(parseFunction());
+      }
+      expect(TokenType.RIGHT_BRACE);
+      return {
+        type: NodeType.MUTUAL,
+        functions,
+      };
     } else {
       throw errorWhileParsing(
         outdent`

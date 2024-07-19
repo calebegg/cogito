@@ -4,6 +4,7 @@
 
 import * as $_404 from './routes/_404.tsx';
 import * as $_app from './routes/_app.tsx';
+import * as $advanced from './routes/advanced.tsx';
 import * as $for_acl2_power_users from './routes/for-acl2-power-users.tsx';
 import * as $index from './routes/index.tsx';
 import * as $Try from './islands/Try.tsx';
@@ -13,6 +14,7 @@ const manifest = {
   routes: {
     './routes/_404.tsx': $_404,
     './routes/_app.tsx': $_app,
+    './routes/advanced.tsx': $advanced,
     './routes/for-acl2-power-users.tsx': $for_acl2_power_users,
     './routes/index.tsx': $index,
   },
