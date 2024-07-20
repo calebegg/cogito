@@ -28,10 +28,11 @@ export enum NodeType {
   SPREAD,
   STATEMENT,
   STRUCT,
+  SWITCH,
   TERMINAL_VALUE,
   THEOREM,
-  TUPLE,
   TUPLE_ASSIGN,
+  TUPLE,
 }
 
 export type Node =
@@ -146,6 +147,7 @@ type Expr =
   | Lambda
   | ListLiteral
   | Spread
+  | Switch
   | TerminalValue
   | Tuple;
 
@@ -169,6 +171,8 @@ interface ListLiteral extends NodeMixin<NodeType.LIST_LITERAL> {
 
 interface Spread extends NodeMixin<NodeType.SPREAD> {
   value: Expr;
+  line: number;
+  char: number;
 }
 
 interface Tuple extends NodeMixin<NodeType.TUPLE> {
@@ -178,6 +182,12 @@ interface Tuple extends NodeMixin<NodeType.TUPLE> {
 interface Lambda extends NodeMixin<NodeType.LAMBDA> {
   parameters: string[];
   body: Expr;
+}
+
+export interface Switch extends NodeMixin<NodeType.SWITCH> {
+  value: Expr;
+  cases: Array<{ value: Expr; body: Expr }>;
+  def?: Expr;
 }
 
 export function parse(tokens: Token[]) {
@@ -630,6 +640,9 @@ export function parse(tokens: Token[]) {
       }
       return inside;
     }
+    if (tokens[current].type === TokenType.SWITCH) {
+      return parseSwitch();
+    }
     // Unary expressions
     if (tokens[current].type === TokenType.BANG) {
       expect(TokenType.BANG);
@@ -655,6 +668,8 @@ export function parse(tokens: Token[]) {
       return {
         type: NodeType.SPREAD,
         value: right,
+        line: tokens[current].line,
+        char: tokens[current].char,
       };
     }
     if (tokens[current].type === TokenType.NEW) {
@@ -707,6 +722,35 @@ export function parse(tokens: Token[]) {
       parameters: maybeParams.map((v) => (v as TerminalValue).value),
       body,
     };
+  }
+
+  function parseSwitch(): Switch {
+    expect(TokenType.SWITCH);
+    expect(TokenType.LEFT_PAREN);
+    const value = parseExpr();
+    expect(TokenType.RIGHT_PAREN);
+    expect(TokenType.LEFT_BRACE);
+    const cases = [];
+    while (tokens[current].type == TokenType.CASE) {
+      expect(TokenType.CASE);
+      const value = parseExpr();
+      expect(TokenType.COLON);
+      const body = parseExpr();
+      expect(TokenType.SEMICOLON);
+      cases.push({
+        value,
+        body,
+      });
+    }
+    let def;
+    if (tokens[current].type === TokenType.DEFAULT) {
+      expect(TokenType.DEFAULT);
+      expect(TokenType.COLON);
+      def = parseExpr();
+      expect(TokenType.SEMICOLON);
+    }
+    expect(TokenType.RIGHT_BRACE);
+    return { type: NodeType.SWITCH, value, cases, def };
   }
 
   function parseLiteral() {

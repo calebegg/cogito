@@ -9,6 +9,7 @@ import outdent from 'https://deno.land/x/outdent@v0.8.0/mod.ts';
 import { parse } from './parse.ts';
 import { print } from './print.ts';
 import { assertSnapshot } from 'https://deno.land/std@0.224.0/testing/snapshot.ts';
+import { assertThrows } from 'https://deno.land/std@0.207.0/assert/mod.ts';
 
 Deno.test('print a basic program', async (t) => {
   await assertSnapshot(
@@ -66,5 +67,45 @@ Deno.test('works with struct types', async (t) => {
         ),
       ),
     ),
+  );
+});
+
+Deno.test('works with switch', async (t) => {
+  await assertSnapshot(
+    t,
+    print(
+      parse(
+        scan(
+          outdent`
+            function foo(x: number) {
+              return switch (x) {
+                case 1: "a";
+                case 2: "b";
+                default: "c";
+              };
+            }
+          `,
+        ),
+      ),
+    ),
+  );
+});
+
+Deno.test('errors with a misplaced spread', () => {
+  assertThrows(
+    () =>
+      print(
+        parse(
+          scan(
+            outdent`
+            function foo(x: list) {
+              return ...x;
+            }
+          `,
+          ),
+        ),
+      ),
+    Error,
+    `Can't use the spread operator`,
   );
 });

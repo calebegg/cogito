@@ -96,13 +96,13 @@ export function print(root: Program) {
         const body = printNode(root.body);
         if (root.parameters.length === 0) {
           return outdent`
-            (defun ${root.name} ()
+            (defun$ ${root.name} ()
               ${body})
           `;
         }
         if (root.parameters.length === 1) {
           return outdent`
-            (defun ${root.name} (${params})
+            (defun$ ${root.name} (${params})
               (declare (xargs :guard ${constraints}))
               (if (not ${constraints})
                 nil
@@ -110,7 +110,7 @@ export function print(root: Program) {
           `;
         }
         return outdent`
-        (defun ${root.name} (${params})
+        (defun$ ${root.name} (${params})
           (declare (xargs :guard (and ${constraints})))
           (if (not (and ${constraints}))
             nil
@@ -157,6 +157,14 @@ export function print(root: Program) {
         return `(let ((${root.name} ${printNode(root.value)}))`;
       case NodeType.TUPLE_ASSIGN:
         return `(mv-let (${root.names.join(' ')}) ${printNode(root.value)}`;
+      case NodeType.SWITCH:
+        return `(cond ${
+          root.cases.map(({ value, body }) =>
+            `((equal ${printNode(root.value)} ${printNode(value)}) ${
+              printNode(body)
+            })`
+          ).join('\n')
+        }${root.def ? ` (t ${printNode(root.def)})` : ''})`;
       case NodeType.RETURN:
         return printNode(root.value);
       case NodeType.TERMINAL_VALUE:
@@ -174,20 +182,19 @@ export function print(root: Program) {
             addFrontMatter('(include-book "projects/apply/top" :dir :system)');
             addFrontMatter(
               outdent`
-                (defun cogito-reduce (xs fn init)
+                (defun$ cogito-reduce (xs fn init)
                   (declare (xargs :guard (and (true-listp xs) (true-listp fn) (equal (len (cadr fn)) 2))))
                   (if (endp xs)
                     init
                     (apply$ fn (list (first xs) (cogito-reduce (rest xs) fn init)))))
               `,
             );
-            addFrontMatter('(defwarrant cogito-reduce)');
             break;
           case 'cogito-map':
             addFrontMatter('(include-book "projects/apply/top" :dir :system)');
             addFrontMatter(
               outdent`
-                (defun cogito-map (xs fn)
+                (defun$ cogito-map (xs fn)
                   (declare (xargs :guard (and (true-listp xs) (true-listp fn) (equal (len (cadr fn)) 1))))
                   (if (endp xs)
                     xs
@@ -196,13 +203,12 @@ export function print(root: Program) {
                       (cogito-map (rest xs) fn))))
               `,
             );
-            addFrontMatter('(defwarrant cogito-map)');
             break;
           case 'cogito-flat-map':
             addFrontMatter('(include-book "projects/apply/top" :dir :system)');
             addFrontMatter(
               outdent`
-                (defun cogito-flat-map (xs fn)
+                (defun$ cogito-flat-map (xs fn)
                   (declare (xargs :guard (and (true-listp xs) (true-listp fn) (equal (len (cadr fn)) 1))))
                   (if (endp xs)
                     xs
@@ -211,13 +217,12 @@ export function print(root: Program) {
                       (cogito-flat-map (rest xs) fn))))
               `,
             );
-            addFrontMatter('(defwarrant cogito-flat-map)');
             break;
           case 'cogito-filter':
             addFrontMatter('(include-book "projects/apply/top" :dir :system)');
             addFrontMatter(
               outdent`
-                (defun cogito-filter (xs fn)
+                (defun$ cogito-filter (xs fn)
                   (declare (xargs :guard (and (true-listp xs) (true-listp fn) (equal (len (cadr fn)) 1))))
                   (if (endp xs)
                     xs
@@ -225,13 +230,12 @@ export function print(root: Program) {
                       (if (apply$ fn (list (first xs))) (cons (first xs) ys) ys))))
               `,
             );
-            addFrontMatter('(defwarrant cogito-filter)');
             break;
           case 'cogito-zip-with':
             addFrontMatter('(include-book "projects/apply/top" :dir :system)');
             addFrontMatter(
               outdent`
-                (defun cogito-zip-with (xs ys fn)
+                (defun$ cogito-zip-with (xs ys fn)
                   (declare (xargs :guard (and (true-listp xs) (true-listp ys) (true-listp fn) (equal (len (cadr fn)) 2))))
                   (if (or (endp xs) (endp ys))
                     nil
@@ -239,7 +243,6 @@ export function print(root: Program) {
                           (cogito-zip-with (rest xs) (rest ys) fn))))
               `,
             );
-            addFrontMatter('(defwarrant cogito-zip-with)');
             break;
         }
         return `(${name} ${root.args.map((a) => printNode(a)).join(' ')})`;
@@ -262,12 +265,15 @@ export function print(root: Program) {
           }).join(' ')
         })`;
       case NodeType.SPREAD:
-        // TODO: Fill in line, char
-        throw error(-1, -1, "Can't use the spread operator here.");
+        throw error(
+          root.line,
+          root.char,
+          "Can't use the spread operator here.",
+        );
       case NodeType.IF:
         throw new Error("Not callable with expressions of type 'IF'");
       case NodeType.ELSE:
-        throw new Error("Not callable with expressions of type 'IF'");
+        throw new Error("Not callable with expressions of type 'ELSE'");
       case NodeType.TUPLE:
         return `(mv ${root.values.map((v) => printNode(v)).join(' ')})`;
       case NodeType.LAMBDA:

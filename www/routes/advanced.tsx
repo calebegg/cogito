@@ -58,6 +58,21 @@ export default function Advanced() {
           `}
         />
       </section>
+      <section>
+        <h3>Switch expressions</h3>
+        <Try
+          initialSource={outdent`
+            function classify(x: number) {
+              return switch (x) {
+                case 0: "zero";
+                case 1: "one";
+                case 2: "two";
+                default: "other";
+              };
+            }
+          `}
+        />
+      </section>
     </>
   );
 }

@@ -46,7 +46,9 @@ export enum TokenType {
 
   // Keywords
   ASSERT,
+  CASE,
   CONST,
+  DEFAULT,
   ELSE,
   FALSE,
   FUNCTION,
@@ -58,6 +60,7 @@ export enum TokenType {
   PRINT,
   RETURN,
   STRUCT,
+  SWITCH,
   THEOREM,
   TRUE,
 
@@ -67,6 +70,7 @@ export enum TokenType {
 const KEYWORDS = new Map([
   ['assert', TokenType.ASSERT],
   ['const', TokenType.CONST],
+  ['default', TokenType.DEFAULT],
   ['else', TokenType.ELSE],
   ['false', TokenType.FALSE],
   ['function', TokenType.FUNCTION],
@@ -80,6 +84,8 @@ const KEYWORDS = new Map([
   ['struct', TokenType.STRUCT],
   ['theorem', TokenType.THEOREM],
   ['true', TokenType.TRUE],
+  ['switch', TokenType.SWITCH],
+  ['case', TokenType.CASE],
 ]);
 
 export interface Token {
