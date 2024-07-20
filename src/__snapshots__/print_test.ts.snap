@@ -9,7 +9,7 @@ snapshot[`print a basic program 1`] = `
     (apply\$ fn (list (first xs) (cogito-reduce (rest xs) fn init)))))
 (include-book "std/util/defaggregate" :dir :system)
 
-(defun\$ foo (x)
+(defun foo (x)
   (declare (xargs :guard (rationalp x)))
   (if (not (rationalp x))
     nil
@@ -43,7 +43,7 @@ snapshot[`works with struct types 1`] = `
 (std::defaggregate point
   ((x (rationalp x)) (y (rationalp y))))
 
-(defun\$ foo (p)
+(defun foo (p)
   (declare (xargs :guard (point-p p)))
   (if (not (point-p p))
     nil
@@ -53,7 +53,7 @@ snapshot[`works with struct types 1`] = `
 snapshot[`works with switch 1`] = `
 '
 
-(defun\$ foo (x)
+(defun foo (x)
   (declare (xargs :guard (rationalp x)))
   (if (not (rationalp x))
     nil

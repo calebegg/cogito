@@ -96,13 +96,13 @@ export function print(root: Program) {
         const body = printNode(root.body);
         if (root.parameters.length === 0) {
           return outdent`
-            (defun$ ${root.name} ()
+            (defun ${root.name} ()
               ${body})
           `;
         }
         if (root.parameters.length === 1) {
           return outdent`
-            (defun$ ${root.name} (${params})
+            (defun ${root.name} (${params})
               (declare (xargs :guard ${constraints}))
               (if (not ${constraints})
                 nil
@@ -110,7 +110,7 @@ export function print(root: Program) {
           `;
         }
         return outdent`
-        (defun$ ${root.name} (${params})
+        (defun ${root.name} (${params})
           (declare (xargs :guard (and ${constraints})))
           (if (not (and ${constraints}))
             nil
