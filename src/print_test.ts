@@ -18,6 +18,8 @@ Deno.test('print a basic program', async (t) => {
       parse(
         scan(
           outdent`
+            import "arithmetic-5/top" from "system";
+
             function foo(x: number) {
               if (x == 0) {
                 x = reduce([1, 2, 3], (x: number, y: number) => x + y * 2, 0);

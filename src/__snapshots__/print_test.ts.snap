@@ -9,6 +9,8 @@ snapshot[`print a basic program 1`] = `
     (apply\$ fn (list (first xs) (cogito-reduce (rest xs) fn init)))))
 (include-book "std/util/defaggregate" :dir :system)
 
+(include-book "arithmetic-5/top" :dir :system)
+
 (defun foo (x)
   (declare (xargs :guard (rationalp x)))
   (if (not (rationalp x))

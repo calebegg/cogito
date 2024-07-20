@@ -17,6 +17,7 @@ export enum NodeType {
   FUNCTION_CALL,
   FUNCTION,
   IF,
+  IMPORT,
   LAMBDA,
   LIST_LITERAL,
   MAIN,
@@ -51,7 +52,14 @@ export interface Program extends NodeMixin<NodeType.PROGRAM> {
   declarations: Declaration[];
 }
 
-export type Declaration = Function | Theorem | Const | Struct | Main | Mutual;
+export type Declaration =
+  | Function
+  | Theorem
+  | Const
+  | Struct
+  | Main
+  | Mutual
+  | Import;
 
 interface Main extends NodeMixin<NodeType.MAIN> {
   body: Statement;
@@ -82,6 +90,11 @@ interface Struct extends NodeMixin<NodeType.STRUCT> {
 
 interface Mutual extends NodeMixin<NodeType.MUTUAL> {
   functions: Function[];
+}
+
+interface Import extends NodeMixin<NodeType.IMPORT> {
+  name: string;
+  from?: string;
 }
 
 export interface Parameter extends NodeMixin<NodeType.PARAMETER> {
@@ -213,7 +226,6 @@ export function parse(tokens: Token[]) {
 
   // declaration -> function | theorem | const | struct | main
   function parseDeclaration(): Declaration {
-    // TODO: add imports
     if (tokens[current].type === TokenType.FUNCTION) {
       return parseFunction();
     } else if (tokens[current].type === TokenType.THEOREM) {
@@ -235,6 +247,20 @@ export function parse(tokens: Token[]) {
       return {
         type: NodeType.MUTUAL,
         functions,
+      };
+    } else if (tokens[current].type === TokenType.IMPORT) {
+      expect(TokenType.IMPORT);
+      const name = expect(TokenType.STRING).lexeme;
+      let from;
+      if (tokens[current].type === TokenType.FROM) {
+        expect(TokenType.FROM);
+        from = expect(TokenType.STRING).lexeme;
+      }
+      expect(TokenType.SEMICOLON);
+      return {
+        type: NodeType.IMPORT,
+        name,
+        from,
       };
     } else {
       throw errorWhileParsing(

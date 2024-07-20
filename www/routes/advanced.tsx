@@ -87,6 +87,10 @@ export default function Advanced() {
           `}
         />
       </section>
+      <section>
+        <h3>Imports</h3>
+        <Try initialSource='import "arithmetic-5/top" from "system";' />
+      </section>
     </>
   );
 }

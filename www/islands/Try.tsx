@@ -39,7 +39,9 @@ export function Try({ initialSource }: { initialSource: string }) {
     } else {
       setOutput([]);
       timeoutId = setTimeout(() => {
-        ws = new WebSocket(`wss://acl2-jbhe53iwqa-uc.a.run.app/acl2`);
+        ws = new WebSocket(
+          `wss://acl2-jbhe53iwqa-uc.a.run.app/acl2?preamble=(set-verify-guards-eagerness 0)`,
+        );
         ws.addEventListener('message', ({ data }) => {
           setOutput((o) => [...o, data]);
         });

@@ -53,6 +53,14 @@ export function print(root: Program) {
         ${progOut}
       `;
       }
+      case NodeType.IMPORT:
+        return `(include-book ${root.name} ${
+          root.from
+            ? `:dir :${
+              root.from.substring(1).substring(0, root.from.length - 2)
+            }`
+            : ''
+        })`;
       case NodeType.MAIN:
         return printNode(root.body);
       case NodeType.MUTUAL:

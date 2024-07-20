@@ -24,6 +24,7 @@ function getFirstBody(node: Program | Declaration) {
       return node.body;
     case NodeType.CONST:
     case NodeType.STRUCT:
+    case NodeType.IMPORT:
       throw new Error('No body');
     default:
       node satisfies never;
