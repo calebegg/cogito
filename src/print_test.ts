@@ -20,7 +20,7 @@ Deno.test('print a basic program', async (t) => {
           outdent`
             function foo(x: number) {
               if (x == 0) {
-                x = reduce([1, 2, 3], (x, y) => x + y * 2, 0);
+                x = reduce([1, 2, 3], (x: number, y: number) => x + y * 2, 0);
                 return x;
               } else if (x == 1) {
                 y = [1, 2 ** 3, 3, ...y];

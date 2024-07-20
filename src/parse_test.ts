@@ -25,8 +25,8 @@ Deno.test('parse a basic program', async (t) => {
         }
 
         theorem |foo works|(x: number) {
-          x = reduce([1, 2, 3], (x, y) => x + y, 0);
-          x = map([1, 2, 3], (x) => x + 1);
+          x = reduce([1, 2, 3], (x: number, y: number) => x + y, 0);
+          x = map([1, 2, 3], (x: number) => x + 1);
           return foo(3,) > 0;
         }
 

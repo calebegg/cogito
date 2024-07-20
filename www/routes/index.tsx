@@ -31,7 +31,7 @@ const FEATURES_SOURCE = outdent`
   }
 
   function sum(l: list<number>) {
-    return reduce(l, (x, y) => x + y, 0);
+    return reduce(l, (x: number, y: number) => x + y, 0);
   }
   
   theorem |sum distributes over append|(l: list<number>, m: list<number>) {

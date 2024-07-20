@@ -240,8 +240,20 @@ snapshot[`parse a basic program 1`] = `
                   type: 5,
                 },
                 parameters: [
-                  "x",
-                  "y",
+                  {
+                    char: 26,
+                    line: 10,
+                    name: "x",
+                    paramType: "number",
+                    type: 12,
+                  },
+                  {
+                    char: 37,
+                    line: 10,
+                    name: "y",
+                    paramType: "number",
+                    type: 12,
+                  },
                 ],
                 type: 8,
               },
@@ -293,7 +305,13 @@ snapshot[`parse a basic program 1`] = `
                     type: 5,
                   },
                   parameters: [
-                    "x",
+                    {
+                      char: 23,
+                      line: 11,
+                      name: "x",
+                      paramType: "number",
+                      type: 12,
+                    },
                   ],
                   type: 8,
                 },

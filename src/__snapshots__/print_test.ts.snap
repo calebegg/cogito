@@ -14,7 +14,8 @@ snapshot[`print a basic program 1`] = `
   (if (not (rationalp x))
     nil
     (if (equal x 0)
-    (let ((x (cogito-reduce (list 1 2 3) (lambda\$ (x y) (+ x (* y 2))) 0)))
+    (let ((x (cogito-reduce (list 1 2 3) (lambda\$ (x y)
+  (declare (xargs :guard (and (rationalp x) (rationalp y)))) (+ x (* y 2))) 0)))
 x)
     
     (if (equal x 1)

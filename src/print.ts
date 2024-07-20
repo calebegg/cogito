@@ -277,9 +277,13 @@ export function print(root: Program) {
       case NodeType.TUPLE:
         return `(mv ${root.values.map((v) => printNode(v)).join(' ')})`;
       case NodeType.LAMBDA:
-        return `(lambda$ (${root.parameters.join(' ')}) ${
-          printNode(root.body)
-        })`;
+        return outdent`
+          (lambda$ (${root.parameters.map((p) => printNode(p)).join(' ')})
+            (declare (xargs :guard (and ${
+          root.parameters.map(
+            (p) => printTypeConstraint(p, structTypes),
+          ).join(' ')
+        }))) ${printNode(root.body)})`;
       default:
         root satisfies never;
         throw new Error('Unreachable');

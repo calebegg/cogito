@@ -47,13 +47,27 @@ export default function Advanced() {
         <Try
           initialSource={outdent`
             main {
-              l = [8, 6, 7, 5, 3, 0, 9];
+              jenny = [8, 6, 7, 5, 3, 0, 9];
 
-              print("Sum: ~x0", reduce(l, (x, y) => x + y, 0));
-              print("Add 1: ~x0", map(l, (x) => x + 1));
-              print("Duplicate: ~x0", flat-map(l, (x) => [x, x]));
-              print("Evens: ~x0", filter(l, (x) => is-even(x)));
-              print("Zip: ~x0", zip-with(l, [1, 2, 3], (x, y) => x + y));
+              print("Sum: ~x0",
+                reduce(jenny, (x: number, y: number) => x + y, 0)
+              );
+              print("Add 1: ~x0",
+                map(jenny, (x: number) => x + 1)
+              );
+              print("Duplicate: ~x0",
+                flat-map(jenny, (x: number) => [x, x])
+              );
+              print("Evens: ~x0",
+                filter(jenny, (x: number) => is-even(x))
+              );
+              print("Zip: ~x0",
+                zip-with(
+                  jenny,
+                  [1, 2, 3],
+                  (x: number, y: number) => x + y
+                )
+              );
             }
           `}
         />

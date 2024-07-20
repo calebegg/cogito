@@ -180,7 +180,7 @@ interface Tuple extends NodeMixin<NodeType.TUPLE> {
 }
 
 interface Lambda extends NodeMixin<NodeType.LAMBDA> {
-  parameters: string[];
+  parameters: Parameter[];
   body: Expr;
 }
 
@@ -615,6 +615,14 @@ export function parse(tokens: Token[]) {
     // '(' (expr ',')* expr ')'
     if (tokens[current].type === TokenType.LEFT_PAREN) {
       expect(TokenType.LEFT_PAREN);
+      if (
+        (tokens[current].type === TokenType.RIGHT_PAREN &&
+          tokens[current + 1].type === TokenType.FAT_ARROW) ||
+        (tokens[current].type === TokenType.IDENTIFIER &&
+          tokens[current + 1].type === TokenType.COLON)
+      ) {
+        return parseLambda();
+      }
       const inside = parseExpr();
       if (tokens[current].type === TokenType.COMMA) {
         const values = [inside];
@@ -626,18 +634,12 @@ export function parse(tokens: Token[]) {
           values.push(parseExpr());
         }
         expect(TokenType.RIGHT_PAREN);
-        if (tokens[current].type === TokenType.FAT_ARROW) {
-          return parseLambda(values);
-        }
         return {
           type: NodeType.TUPLE,
           values,
         };
       }
       expect(TokenType.RIGHT_PAREN);
-      if (tokens[current].type === TokenType.FAT_ARROW) {
-        return parseLambda([inside]);
-      }
       return inside;
     }
     if (tokens[current].type === TokenType.SWITCH) {
@@ -708,18 +710,15 @@ export function parse(tokens: Token[]) {
     }
   }
 
-  function parseLambda(maybeParams: Expr[]): Lambda {
+  function parseLambda(): Lambda {
+    const parameters = parseParameters();
+    expect(TokenType.RIGHT_PAREN);
     expect(TokenType.FAT_ARROW);
     // TODO: Support block bodies
     const body = parseExpr();
-    if (maybeParams.every((v) => v.type !== NodeType.TERMINAL_VALUE)) {
-      throw errorWhileParsing(
-        'Parameters to an arrow function must be identifiers',
-      );
-    }
     return {
       type: NodeType.LAMBDA,
-      parameters: maybeParams.map((v) => (v as TerminalValue).value),
+      parameters,
       body,
     };
   }
