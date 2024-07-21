@@ -6,7 +6,7 @@
 
 import outdent from 'https://deno.land/x/outdent@v0.8.0/mod.ts';
 import { error } from './main.ts';
-import { Token, TokenType } from './scan.ts';
+import { Token, TokenType as TT } from './scan.ts';
 
 export enum NodeType {
   ASSERT,
@@ -208,6 +208,10 @@ export function parse(tokens: Token[]) {
   let hasMain = false;
   let current = 0;
 
+  function curr() {
+    return tokens[current];
+  }
+
   function errorWhileParsing(msg: string) {
     return error(tokens[current].line, tokens[current].char, msg);
   }
@@ -215,10 +219,10 @@ export function parse(tokens: Token[]) {
   // program -> declaration* EOF
   function parseProgram(): Program {
     const declarations: Declaration[] = [];
-    while (tokens[current].type !== TokenType.EOF) {
+    while (curr().type !== TT.EOF) {
       declarations.push(parseDeclaration());
     }
-    expect(TokenType.EOF);
+    expect(TT.EOF);
     return {
       type: NodeType.PROGRAM,
       declarations,
@@ -227,37 +231,37 @@ export function parse(tokens: Token[]) {
 
   // declaration -> function | theorem | const | struct | main
   function parseDeclaration(): Declaration {
-    if (tokens[current].type === TokenType.FUNCTION) {
+    if (curr().type === TT.FUNCTION) {
       return parseFunction();
-    } else if (tokens[current].type === TokenType.THEOREM) {
+    } else if (curr().type === TT.THEOREM) {
       return parseTheorem();
-    } else if (tokens[current].type === TokenType.CONST) {
+    } else if (curr().type === TT.CONST) {
       return parseConst();
-    } else if (tokens[current].type === TokenType.STRUCT) {
+    } else if (curr().type === TT.STRUCT) {
       return parseStruct();
-    } else if (tokens[current].type === TokenType.MAIN) {
+    } else if (curr().type === TT.MAIN) {
       return parseMain();
-    } else if (tokens[current].type === TokenType.MUTUAL) {
+    } else if (curr().type === TT.MUTUAL) {
       const functions = [];
-      expect(TokenType.MUTUAL);
-      expect(TokenType.LEFT_BRACE);
-      while (tokens[current].type === TokenType.FUNCTION) {
+      expect(TT.MUTUAL);
+      expect(TT.LEFT_BRACE);
+      while (curr().type === TT.FUNCTION) {
         functions.push(parseFunction());
       }
-      expect(TokenType.RIGHT_BRACE);
+      expect(TT.RIGHT_BRACE);
       return {
         type: NodeType.MUTUAL,
         functions,
       };
-    } else if (tokens[current].type === TokenType.IMPORT) {
-      expect(TokenType.IMPORT);
-      const name = expect(TokenType.STRING).lexeme;
+    } else if (curr().type === TT.IMPORT) {
+      expect(TT.IMPORT);
+      const name = expect(TT.STRING).lexeme;
       let from;
-      if (tokens[current].type === TokenType.FROM) {
-        expect(TokenType.FROM);
-        from = expect(TokenType.STRING).lexeme;
+      if (curr().type === TT.FROM) {
+        expect(TT.FROM);
+        from = expect(TT.STRING).lexeme;
       }
-      expect(TokenType.SEMICOLON);
+      expect(TT.SEMICOLON);
       return {
         type: NodeType.IMPORT,
         name,
@@ -266,7 +270,7 @@ export function parse(tokens: Token[]) {
     } else {
       throw errorWhileParsing(
         outdent`
-          Expected a declaration, got ${TokenType[tokens[current].type]}
+          Expected a declaration, got ${TT[curr().type]}
           Every top level expression must be a declaration. To have code
           that executes at the top level, introduce a 'main' declaration.
         `.trim(),
@@ -276,22 +280,22 @@ export function parse(tokens: Token[]) {
 
   // function -> 'function' IDENTIFIER '(' parameters* ')' '{' statement* '}'
   function parseFunction(): Function {
-    expect(TokenType.FUNCTION);
-    const name = expect(TokenType.IDENTIFIER).lexeme;
-    expect(TokenType.LEFT_PAREN);
+    expect(TT.FUNCTION);
+    const name = expect(TT.IDENTIFIER).lexeme;
+    expect(TT.LEFT_PAREN);
     const parameters = parseParameters();
-    expect(TokenType.RIGHT_PAREN);
-    expect(TokenType.LEFT_BRACE);
+    expect(TT.RIGHT_PAREN);
+    expect(TT.LEFT_BRACE);
     let measure;
-    if (tokens[current].type === TokenType.MEASURE) {
-      expect(TokenType.MEASURE);
-      expect(TokenType.LEFT_PAREN);
+    if (curr().type === TT.MEASURE) {
+      expect(TT.MEASURE);
+      expect(TT.LEFT_PAREN);
       measure = parseExpr();
-      expect(TokenType.RIGHT_PAREN);
-      expect(TokenType.SEMICOLON);
+      expect(TT.RIGHT_PAREN);
+      expect(TT.SEMICOLON);
     }
     const body = parseStatement();
-    expect(TokenType.RIGHT_BRACE);
+    expect(TT.RIGHT_BRACE);
     return {
       type: NodeType.FUNCTION,
       name: name,
@@ -303,14 +307,14 @@ export function parse(tokens: Token[]) {
 
   // theorem -> 'theorem' IDENTIFIER '(' (parameters ',')* ')' '{' statement* '}'
   function parseTheorem(): Theorem {
-    expect(TokenType.THEOREM);
-    const name = expect(TokenType.IDENTIFIER).lexeme;
-    expect(TokenType.LEFT_PAREN);
+    expect(TT.THEOREM);
+    const name = expect(TT.IDENTIFIER).lexeme;
+    expect(TT.LEFT_PAREN);
     const parameters = parseParameters();
-    expect(TokenType.RIGHT_PAREN);
-    expect(TokenType.LEFT_BRACE);
+    expect(TT.RIGHT_PAREN);
+    expect(TT.LEFT_BRACE);
     const body = parseStatement();
-    expect(TokenType.RIGHT_BRACE);
+    expect(TT.RIGHT_BRACE);
     return {
       type: NodeType.THEOREM,
       name,
@@ -321,16 +325,16 @@ export function parse(tokens: Token[]) {
 
   // const -> 'const' IDENTIFIER '=' expr ';'
   function parseConst(): Const {
-    expect(TokenType.CONST);
-    const name = expect(TokenType.IDENTIFIER).lexeme;
+    expect(TT.CONST);
+    const name = expect(TT.IDENTIFIER).lexeme;
     if (!name.startsWith('*') && !name.endsWith('*')) {
       throw errorWhileParsing(
         `Const names must begin and end with '*', *like-this*, got ${name} instead`,
       );
     }
-    expect(TokenType.EQUAL);
+    expect(TT.EQUAL);
     const value = parseExpr();
-    expect(TokenType.SEMICOLON);
+    expect(TT.SEMICOLON);
     return {
       type: NodeType.CONST,
       name,
@@ -339,12 +343,12 @@ export function parse(tokens: Token[]) {
   }
 
   function parseStruct(): Struct {
-    expect(TokenType.STRUCT);
-    const name = expect(TokenType.IDENTIFIER).lexeme;
-    expect(TokenType.LEFT_PAREN);
+    expect(TT.STRUCT);
+    const name = expect(TT.IDENTIFIER).lexeme;
+    expect(TT.LEFT_PAREN);
     const parameters = parseParameters();
-    expect(TokenType.RIGHT_PAREN);
-    expect(TokenType.SEMICOLON);
+    expect(TT.RIGHT_PAREN);
+    expect(TT.SEMICOLON);
     return {
       type: NodeType.STRUCT,
       name,
@@ -354,12 +358,12 @@ export function parse(tokens: Token[]) {
 
   function parseParameters() {
     const parameters: Parameter[] = [];
-    if (tokens[current].type != TokenType.RIGHT_PAREN) {
+    if (curr().type != TT.RIGHT_PAREN) {
       while (true) {
-        if (tokens[current].type == TokenType.RIGHT_PAREN) break;
+        if (curr().type == TT.RIGHT_PAREN) break;
         parameters.push(parseParameter());
-        if (tokens[current].type === TokenType.COMMA) {
-          expect(TokenType.COMMA);
+        if (curr().type === TT.COMMA) {
+          expect(TT.COMMA);
         } else {
           break;
         }
@@ -370,33 +374,33 @@ export function parse(tokens: Token[]) {
 
   // parameter -> IDENTIFIER ':' type
   function parseParameter(): Parameter {
-    const { lexeme: name, line, char } = expect(TokenType.IDENTIFIER);
-    expect(TokenType.COLON);
+    const { lexeme: name, line, char } = expect(TT.IDENTIFIER);
+    expect(TT.COLON);
     const paramType = parseType();
     return { type: NodeType.PARAMETER, line, char, name, paramType };
   }
 
   // type -> IDENTIFIER
   function parseType(): string {
-    return expect(TokenType.IDENTIFIER).lexeme;
+    return expect(TT.IDENTIFIER).lexeme;
   }
 
   // statement -> print | assign | return | if | expr
   function parseStatement(): Statement {
     let contents: Statement['contents'];
-    switch (tokens[current].type) {
-      case TokenType.PRINT:
+    switch (curr().type) {
+      case TT.PRINT:
         contents = parsePrint();
         break;
-      case TokenType.ASSERT:
+      case TT.ASSERT:
         contents = parseAssert();
         break;
-      case TokenType.IDENTIFIER: {
-        if (tokens[current + 1].type === TokenType.EQUAL) {
+      case TT.IDENTIFIER: {
+        if (tokens[current + 1].type === TT.EQUAL) {
           contents = parseAssign();
         } else {
           const expr = parseExpr();
-          expect(TokenType.SEMICOLON);
+          expect(TT.SEMICOLON);
           if (expr.type === NodeType.FUNCTION_CALL) {
             contents = expr;
           } else {
@@ -409,22 +413,24 @@ export function parse(tokens: Token[]) {
         }
         break;
       }
-      case TokenType.LEFT_PAREN:
+      case TT.LEFT_PAREN:
         contents = parseAssign();
         break;
-      case TokenType.RETURN:
+      case TT.RETURN:
         contents = parseReturn();
         break;
-      case TokenType.IF:
+      case TT.IF:
         contents = parseIf();
         break;
+      case TT.MEASURE:
+        throw errorWhileParsing('Measures must be at the top of the function');
       default:
         throw errorWhileParsing(
-          `Expected a statement but got ${TokenType[tokens[current].type]}`,
+          `Expected a statement but got ${TT[curr().type]}`,
         );
     }
     let rest;
-    if (tokens[current].type === TokenType.RIGHT_BRACE) {
+    if (curr().type === TT.RIGHT_BRACE) {
       rest = null;
     } else {
       if (contents.type === NodeType.RETURN) {
@@ -441,18 +447,18 @@ export function parse(tokens: Token[]) {
 
   // print -> 'print' '(' template expr* ')' ';'
   function parsePrint(): Print {
-    expect(TokenType.PRINT);
-    expect(TokenType.LEFT_PAREN);
-    const template = expect(TokenType.STRING).lexeme;
+    expect(TT.PRINT);
+    expect(TT.LEFT_PAREN);
+    const template = expect(TT.STRING).lexeme;
     let expressions: Expr[];
-    if (tokens[current].type === TokenType.RIGHT_PAREN) {
+    if (curr().type === TT.RIGHT_PAREN) {
       expressions = [];
     } else {
-      expect(TokenType.COMMA);
+      expect(TT.COMMA);
       expressions = parseExpressions();
     }
-    expect(TokenType.RIGHT_PAREN);
-    expect(TokenType.SEMICOLON);
+    expect(TT.RIGHT_PAREN);
+    expect(TT.SEMICOLON);
     return {
       type: NodeType.PRINT,
       template,
@@ -462,11 +468,11 @@ export function parse(tokens: Token[]) {
 
   // assert -> 'assert' '(' expr ')' ';'
   function parseAssert(): Assert {
-    expect(TokenType.ASSERT);
-    expect(TokenType.LEFT_PAREN);
+    expect(TT.ASSERT);
+    expect(TT.LEFT_PAREN);
     const value = parseExpr();
-    expect(TokenType.RIGHT_PAREN);
-    expect(TokenType.SEMICOLON);
+    expect(TT.RIGHT_PAREN);
+    expect(TT.SEMICOLON);
     return {
       type: NodeType.ASSERT,
       value,
@@ -475,9 +481,9 @@ export function parse(tokens: Token[]) {
 
   // return -> 'return' expr ';'
   function parseReturn(): Return {
-    expect(TokenType.RETURN);
+    expect(TT.RETURN);
     const value = parseExpr();
-    expect(TokenType.SEMICOLON);
+    expect(TT.SEMICOLON);
     return {
       type: NodeType.RETURN,
       value,
@@ -487,27 +493,27 @@ export function parse(tokens: Token[]) {
   // assign -> IDENTIFIER '=' expr ';'
   // assign -> '(' ID (',' ID)* ','? ')' '=' expr ';'
   function parseAssign(): Assign | TupleAssign {
-    if (tokens[current].type === TokenType.LEFT_PAREN) {
-      expect(TokenType.LEFT_PAREN);
-      const names = [expect(TokenType.IDENTIFIER).lexeme];
-      while (tokens[current].type === TokenType.COMMA) {
-        expect(TokenType.COMMA);
-        names.push(expect(TokenType.IDENTIFIER).lexeme);
+    if (curr().type === TT.LEFT_PAREN) {
+      expect(TT.LEFT_PAREN);
+      const names = [expect(TT.IDENTIFIER).lexeme];
+      while (curr().type === TT.COMMA) {
+        expect(TT.COMMA);
+        names.push(expect(TT.IDENTIFIER).lexeme);
       }
-      expect(TokenType.RIGHT_PAREN);
-      expect(TokenType.EQUAL);
+      expect(TT.RIGHT_PAREN);
+      expect(TT.EQUAL);
       const value = parseExpr();
-      expect(TokenType.SEMICOLON);
+      expect(TT.SEMICOLON);
       return {
         type: NodeType.TUPLE_ASSIGN,
         names,
         value,
       };
     } else {
-      const name = expect(TokenType.IDENTIFIER).lexeme;
-      expect(TokenType.EQUAL);
+      const name = expect(TT.IDENTIFIER).lexeme;
+      expect(TT.EQUAL);
       const value = parseExpr();
-      expect(TokenType.SEMICOLON);
+      expect(TT.SEMICOLON);
       return {
         type: NodeType.ASSIGN,
         name,
@@ -525,10 +531,10 @@ export function parse(tokens: Token[]) {
       );
     }
     hasMain = true;
-    expect(TokenType.MAIN);
-    expect(TokenType.LEFT_BRACE);
+    expect(TT.MAIN);
+    expect(TT.LEFT_BRACE);
     const body = parseStatement();
-    expect(TokenType.RIGHT_BRACE);
+    expect(TT.RIGHT_BRACE);
     return {
       type: NodeType.MAIN,
       body,
@@ -538,18 +544,18 @@ export function parse(tokens: Token[]) {
   function parseIf(): If | Else {
     let condition;
     const { line, char } = tokens[current];
-    if (tokens[current].type === TokenType.IF) {
-      expect(TokenType.IF);
-      expect(TokenType.LEFT_PAREN);
+    if (curr().type === TT.IF) {
+      expect(TT.IF);
+      expect(TT.LEFT_PAREN);
       condition = parseExpr();
-      expect(TokenType.RIGHT_PAREN);
+      expect(TT.RIGHT_PAREN);
     }
-    expect(TokenType.LEFT_BRACE);
+    expect(TT.LEFT_BRACE);
     const body = parseStatement();
-    expect(TokenType.RIGHT_BRACE);
+    expect(TT.RIGHT_BRACE);
     let elseBranch = null;
-    if (tokens[current].type === TokenType.ELSE) {
-      expect(TokenType.ELSE);
+    if (curr().type === TT.ELSE) {
+      expect(TT.ELSE);
       elseBranch = parseIf();
     }
     return condition
@@ -572,12 +578,12 @@ export function parse(tokens: Token[]) {
   function parseExpressions() {
     const expressions: Expr[] = [];
     while (
-      tokens[current].type !== TokenType.RIGHT_PAREN &&
-      tokens[current].type !== TokenType.RIGHT_BRACKET
+      curr().type !== TT.RIGHT_PAREN &&
+      curr().type !== TT.RIGHT_BRACKET
     ) {
       expressions.push(parseExpr());
-      if (tokens[current].type === TokenType.COMMA) {
-        expect(TokenType.COMMA);
+      if (curr().type === TT.COMMA) {
+        expect(TT.COMMA);
       } else {
         break;
       }
@@ -587,25 +593,25 @@ export function parse(tokens: Token[]) {
 
   function parseExpr(minPrec = 1): Expr {
     const opers = new Map<
-      TokenType,
-      { precidence: number; assoc: 'left' | 'right' }
+      TT,
+      { precidence: number; assocRight?: true }
     >(
       [
-        [TokenType.SKINNY_ARROW, { precidence: 1, assoc: 'left' }],
-        [TokenType.AMP_AMP, { precidence: 2, assoc: 'left' }],
-        [TokenType.PIPE_PIPE, { precidence: 2, assoc: 'left' }],
-        [TokenType.EQUAL_EQUAL, { precidence: 3, assoc: 'left' }],
-        [TokenType.GREATER, { precidence: 3, assoc: 'left' }],
-        [TokenType.GREATER_EQUAL, { precidence: 3, assoc: 'left' }],
-        [TokenType.LESS, { precidence: 3, assoc: 'left' }],
-        [TokenType.LESS_EQUAL, { precidence: 3, assoc: 'left' }],
-        [TokenType.BANG_EQUAL, { precidence: 3, assoc: 'left' }],
-        [TokenType.PLUS, { precidence: 4, assoc: 'left' }],
-        [TokenType.MINUS, { precidence: 4, assoc: 'left' }],
-        [TokenType.STAR, { precidence: 5, assoc: 'left' }],
-        [TokenType.SLASH, { precidence: 5, assoc: 'left' }],
-        [TokenType.STAR_STAR, { precidence: 6, assoc: 'right' }],
-        [TokenType.DOT, { precidence: 7, assoc: 'left' }],
+        [TT.SKINNY_ARROW, { precidence: 1 }],
+        [TT.AMP_AMP, { precidence: 2 }],
+        [TT.PIPE_PIPE, { precidence: 2 }],
+        [TT.EQUAL_EQUAL, { precidence: 3 }],
+        [TT.GREATER, { precidence: 3 }],
+        [TT.GREATER_EQUAL, { precidence: 3 }],
+        [TT.LESS, { precidence: 3 }],
+        [TT.LESS_EQUAL, { precidence: 3 }],
+        [TT.BANG_EQUAL, { precidence: 3 }],
+        [TT.PLUS, { precidence: 4 }],
+        [TT.MINUS, { precidence: 4 }],
+        [TT.STAR, { precidence: 5 }],
+        [TT.SLASH, { precidence: 5 }],
+        [TT.STAR_STAR, { precidence: 6, assocRight: true }],
+        [TT.DOT, { precidence: 7 }],
       ],
     );
 
@@ -617,11 +623,11 @@ export function parse(tokens: Token[]) {
       if (metadata.precidence < minPrec) break;
       expect(operToken.type);
       let nextMinPrec = metadata.precidence;
-      if (metadata.assoc === 'left') {
+      if (!metadata.assocRight) {
         nextMinPrec++;
       }
       const right = parseExpr(nextMinPrec);
-      if (operToken.type === TokenType.DOT) {
+      if (operToken.type === TT.DOT) {
         if (right.type !== NodeType.TERMINAL_VALUE) {
           throw errorWhileParsing("Right side of a '.' must be an identifier");
         }
@@ -639,51 +645,51 @@ export function parse(tokens: Token[]) {
 
   function parseLeaf(): Expr {
     // '[' expr* ']'
-    if (tokens[current].type === TokenType.LEFT_BRACKET) {
-      expect(TokenType.LEFT_BRACKET);
+    if (curr().type === TT.LEFT_BRACKET) {
+      expect(TT.LEFT_BRACKET);
       const contents = parseExpressions();
-      expect(TokenType.RIGHT_BRACKET);
+      expect(TT.RIGHT_BRACKET);
       return {
         type: NodeType.LIST_LITERAL,
         contents,
       };
     }
     // '(' (expr ',')* expr ')'
-    if (tokens[current].type === TokenType.LEFT_PAREN) {
-      expect(TokenType.LEFT_PAREN);
+    if (curr().type === TT.LEFT_PAREN) {
+      expect(TT.LEFT_PAREN);
       if (
-        (tokens[current].type === TokenType.RIGHT_PAREN &&
-          tokens[current + 1].type === TokenType.FAT_ARROW) ||
-        (tokens[current].type === TokenType.IDENTIFIER &&
-          tokens[current + 1].type === TokenType.COLON)
+        (curr().type === TT.RIGHT_PAREN &&
+          tokens[current + 1].type === TT.FAT_ARROW) ||
+        (curr().type === TT.IDENTIFIER &&
+          tokens[current + 1].type === TT.COLON)
       ) {
         return parseLambda();
       }
       const inside = parseExpr();
-      if (tokens[current].type === TokenType.COMMA) {
+      if (curr().type === TT.COMMA) {
         const values = [inside];
-        while (tokens[current].type === TokenType.COMMA) {
-          expect(TokenType.COMMA);
-          if (tokens[current].type === TokenType.RIGHT_PAREN) {
+        while (curr().type === TT.COMMA) {
+          expect(TT.COMMA);
+          if (curr().type === TT.RIGHT_PAREN) {
             break;
           }
           values.push(parseExpr());
         }
-        expect(TokenType.RIGHT_PAREN);
+        expect(TT.RIGHT_PAREN);
         return {
           type: NodeType.TUPLE,
           values,
         };
       }
-      expect(TokenType.RIGHT_PAREN);
+      expect(TT.RIGHT_PAREN);
       return inside;
     }
-    if (tokens[current].type === TokenType.SWITCH) {
+    if (curr().type === TT.SWITCH) {
       return parseSwitch();
     }
     // Unary expressions
-    if (tokens[current].type === TokenType.BANG) {
-      expect(TokenType.BANG);
+    if (curr().type === TT.BANG) {
+      expect(TT.BANG);
       const right = parseExpr();
       return {
         type: NodeType.FUNCTION_CALL,
@@ -691,8 +697,8 @@ export function parse(tokens: Token[]) {
         args: [right],
       };
     }
-    if (tokens[current].type === TokenType.MINUS) {
-      expect(TokenType.MINUS);
+    if (curr().type === TT.MINUS) {
+      expect(TT.MINUS);
       const right = parseExpr();
       return {
         type: NodeType.FUNCTION_CALL,
@@ -700,8 +706,8 @@ export function parse(tokens: Token[]) {
         args: [right],
       };
     }
-    if (tokens[current].type === TokenType.DOT_DOT_DOT) {
-      expect(TokenType.DOT_DOT_DOT);
+    if (curr().type === TT.DOT_DOT_DOT) {
+      expect(TT.DOT_DOT_DOT);
       const right = parseExpr();
       return {
         type: NodeType.SPREAD,
@@ -710,8 +716,8 @@ export function parse(tokens: Token[]) {
         char: tokens[current].char,
       };
     }
-    if (tokens[current].type === TokenType.NEW) {
-      expect(TokenType.NEW);
+    if (curr().type === TT.NEW) {
+      expect(TT.NEW);
       const right = parseExpr();
       if (right.type !== NodeType.FUNCTION_CALL) {
         throw error(
@@ -722,12 +728,12 @@ export function parse(tokens: Token[]) {
       }
       return right;
     }
-    if (tokens[current].type === TokenType.IDENTIFIER) {
-      const { lexeme } = expect(TokenType.IDENTIFIER);
-      if (tokens[current].type === TokenType.LEFT_PAREN) {
-        expect(TokenType.LEFT_PAREN);
+    if (curr().type === TT.IDENTIFIER) {
+      const { lexeme } = expect(TT.IDENTIFIER);
+      if (curr().type === TT.LEFT_PAREN) {
+        expect(TT.LEFT_PAREN);
         const args = parseExpressions();
-        expect(TokenType.RIGHT_PAREN);
+        expect(TT.RIGHT_PAREN);
         return {
           type: NodeType.FUNCTION_CALL,
           name: lexeme,
@@ -748,8 +754,8 @@ export function parse(tokens: Token[]) {
 
   function parseLambda(): Lambda {
     const parameters = parseParameters();
-    expect(TokenType.RIGHT_PAREN);
-    expect(TokenType.FAT_ARROW);
+    expect(TT.RIGHT_PAREN);
+    expect(TT.FAT_ARROW);
     // TODO: Support block bodies
     const body = parseExpr();
     return {
@@ -760,62 +766,62 @@ export function parse(tokens: Token[]) {
   }
 
   function parseSwitch(): Switch {
-    expect(TokenType.SWITCH);
-    expect(TokenType.LEFT_PAREN);
+    expect(TT.SWITCH);
+    expect(TT.LEFT_PAREN);
     const value = parseExpr();
-    expect(TokenType.RIGHT_PAREN);
-    expect(TokenType.LEFT_BRACE);
+    expect(TT.RIGHT_PAREN);
+    expect(TT.LEFT_BRACE);
     const cases = [];
-    while (tokens[current].type == TokenType.CASE) {
-      expect(TokenType.CASE);
+    while (curr().type == TT.CASE) {
+      expect(TT.CASE);
       const value = parseExpr();
-      expect(TokenType.COLON);
+      expect(TT.COLON);
       const body = parseExpr();
-      expect(TokenType.SEMICOLON);
+      expect(TT.SEMICOLON);
       cases.push({
         value,
         body,
       });
     }
     let def;
-    if (tokens[current].type === TokenType.DEFAULT) {
-      expect(TokenType.DEFAULT);
-      expect(TokenType.COLON);
+    if (curr().type === TT.DEFAULT) {
+      expect(TT.DEFAULT);
+      expect(TT.COLON);
       def = parseExpr();
-      expect(TokenType.SEMICOLON);
+      expect(TT.SEMICOLON);
     }
-    expect(TokenType.RIGHT_BRACE);
+    expect(TT.RIGHT_BRACE);
     return { type: NodeType.SWITCH, value, cases, def };
   }
 
   function parseLiteral() {
-    switch (tokens[current].type) {
-      case TokenType.NUMBER:
-        return expect(TokenType.NUMBER).literal!;
-      case TokenType.STRING:
-        return expect(TokenType.STRING).lexeme;
-      case TokenType.TRUE:
-        return expect(TokenType.TRUE).lexeme;
-      case TokenType.FALSE:
-        return expect(TokenType.FALSE).lexeme;
-      case TokenType.NIL:
-        return expect(TokenType.NIL).lexeme;
+    switch (curr().type) {
+      case TT.NUMBER:
+        return expect(TT.NUMBER).literal!;
+      case TT.STRING:
+        return expect(TT.STRING).lexeme;
+      case TT.TRUE:
+        return expect(TT.TRUE).lexeme;
+      case TT.FALSE:
+        return expect(TT.FALSE).lexeme;
+      case TT.NIL:
+        return expect(TT.NIL).lexeme;
       default:
         throw errorWhileParsing(
-          `Unexpected token ${TokenType[tokens[current].type]}`,
+          `Unexpected token ${TT[curr().type]}`,
         );
     }
   }
 
-  function expect(...types: TokenType[]): Token {
-    if (types.includes(tokens[current].type)) {
+  function expect(...types: TT[]): Token {
+    if (types.includes(curr().type)) {
       const token = tokens[current];
       current++;
       return token;
     }
     throw errorWhileParsing(
-      `Expected ${types.map((tt) => TokenType[tt]).join(', ')} but found ${
-        TokenType[tokens[current].type]
+      `Expected ${types.map((tt) => TT[tt]).join(', ')} but found ${
+        TT[curr().type]
       }`,
     );
   }
