@@ -208,10 +208,11 @@ Form:\\s+\\( ([A-Z:-]+) (.*) \\.\\.\\.\\)`),
       message: output.substring(0, 80) + (output.length > 80 ? '...' : ''),
     };
   } else if (
-    summaryMatch[1] === 'INCLUDE-BOOK' ||
     summaryMatch[2].startsWith('COGITO-')
   ) {
     return null;
+  } else if (summaryMatch[1] === 'INCLUDE-BOOK') {
+    return { state, message: 'Importing ${summaryMatch[2]}' };
   } else if (summaryMatch[1] === 'DEFUN') {
     return { state, message: `Admission of ${summaryMatch[2]}` };
   } else if (summaryMatch[1] === 'DEFTHM') {
