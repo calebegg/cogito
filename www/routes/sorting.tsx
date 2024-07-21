@@ -12,6 +12,44 @@ export default function Sorting() {
         currently.
       </p>
       <section>
+        <h2>Insertion sort</h2>
+        <Try
+          initialSource={outdent`
+            function insert(x: number, xs: list<number>) {
+              if (is-empty(xs)) {
+                return [x];
+              }
+              if (first(xs) > x) {
+                return [x, first(xs), ...rest(xs)];
+              }
+              return [first(xs), ...insert(x, rest(xs))];
+            }
+            
+            
+            theorem |insert preserves length|(x: number, list: list<number>) {
+              return len(insert(x, list)) == len(list) + 1;
+            }
+            
+            function isort(xs: list<number>) {
+              if (is-empty(xs)) {
+                return [];
+              }
+              return insert(first(xs), isort(rest(xs)));
+            }
+            
+            theorem |isort preserves length|(list: list<number>) {
+              return len(isort(list)) == len(list);
+            }
+            
+            const *jenny* = [8, 6, 7, 5, 3, 0, 9];
+            
+            main {
+              print("~x0", isort(*jenny*));
+            }
+          `}
+        />
+      </section>
+      <section>
         <h2>Merge sort</h2>
         <Try
           initialSource={outdent`
