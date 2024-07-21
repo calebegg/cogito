@@ -21,6 +21,14 @@ export default function Advanced() {
             }
             return [y, ...mrg(xs, rest(ys))];
           }
+
+          function dmx(xs: list) {
+            if (is-empty(xs)) {
+              return ([], []);
+            }
+            (ys, zs) = dmx(rest(xs));
+            return ([first(xs), ...zs], ys);
+          }
         `}
       />
     </>

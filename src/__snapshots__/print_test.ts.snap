@@ -14,7 +14,7 @@ snapshot[`print a basic program 1`] = `
 (defun foo (x)
   (declare (xargs :guard (rationalp x) ))
   (if (not (rationalp x))
-    nil
+    (mv nil nil nil)
     (if (equal x 0)
     (let ((x (cogito-reduce (list 1 2 3) (lambda\$ (x y)
   (declare (xargs :guard (and (rationalp x) (rationalp y)))) (+ x (* y 2))) 0)))
@@ -62,4 +62,14 @@ snapshot[`works with switch 1`] = `
     nil
     (cond ((equal x 1) "a")
 ((equal x 2) "b") (t "c"))))'
+`;
+
+snapshot[`returns appropriate tuples 1`] = `
+"
+
+(defun foo (x)
+  (declare (xargs :guard (rationalp x) ))
+  (if (not (rationalp x))
+    (mv nil nil)
+    (mv x (+ x 1))))"
 `;

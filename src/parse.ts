@@ -123,7 +123,7 @@ interface Print extends NodeMixin<NodeType.PRINT> {
   expressions: Expr[];
 }
 
-interface Return extends NodeMixin<NodeType.RETURN> {
+export interface Return extends NodeMixin<NodeType.RETURN> {
   value: Expr;
 }
 
@@ -213,7 +213,7 @@ export function parse(tokens: Token[]) {
   }
 
   function errorWhileParsing(msg: string) {
-    return error(tokens[current].line, tokens[current].char, msg);
+    return error(curr().line, curr().char, msg);
   }
 
   // program -> declaration* EOF
@@ -525,8 +525,8 @@ export function parse(tokens: Token[]) {
   function parseMain(): Main {
     if (hasMain) {
       throw error(
-        tokens[current].line,
-        tokens[current].char,
+        curr().line,
+        curr().char,
         'Only one main declaration is allowed',
       );
     }
@@ -543,7 +543,7 @@ export function parse(tokens: Token[]) {
 
   function parseIf(): If | Else {
     let condition;
-    const { line, char } = tokens[current];
+    const { line, char } = curr();
     if (curr().type === TT.IF) {
       expect(TT.IF);
       expect(TT.LEFT_PAREN);
@@ -617,7 +617,7 @@ export function parse(tokens: Token[]) {
 
     let left: Expr = parseLeaf();
     while (true) {
-      const operToken = tokens[current];
+      const operToken = curr();
       const metadata = opers.get(operToken.type);
       if (!metadata) break;
       if (metadata.precidence < minPrec) break;
@@ -712,17 +712,15 @@ export function parse(tokens: Token[]) {
       return {
         type: NodeType.SPREAD,
         value: right,
-        line: tokens[current].line,
-        char: tokens[current].char,
+        line: curr().line,
+        char: curr().char,
       };
     }
     if (curr().type === TT.NEW) {
       expect(TT.NEW);
       const right = parseExpr();
       if (right.type !== NodeType.FUNCTION_CALL) {
-        throw error(
-          tokens[current].line,
-          tokens[current].char,
+        throw errorWhileParsing(
           'New expressions must be function calls',
         );
       }
@@ -815,7 +813,7 @@ export function parse(tokens: Token[]) {
 
   function expect(...types: TT[]): Token {
     if (types.includes(curr().type)) {
-      const token = tokens[current];
+      const token = curr();
       current++;
       return token;
     }

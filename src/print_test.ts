@@ -111,3 +111,20 @@ Deno.test('errors with a misplaced spread', () => {
     `Can't use the spread operator`,
   );
 });
+
+Deno.test('returns appropriate tuples', async (t) => {
+  await assertSnapshot(
+    t,
+    print(
+      parse(
+        scan(
+          outdent`
+            function foo(x: number) {
+              return (x, x + 1);
+            }
+          `,
+        ),
+      ),
+    ),
+  );
+});

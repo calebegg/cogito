@@ -13,6 +13,7 @@ import {
   NodeType,
   Parameter,
   Program,
+  Return,
   Statement,
 } from './parse.ts';
 import { endsInReturn } from './check.ts';
@@ -95,6 +96,19 @@ export function print(root: Program) {
         `;
       }
       case NodeType.FUNCTION: {
+        const returnTupleArity = Math.max(
+          ...findReturns(root.body).map((r) =>
+            r.value.type === NodeType.TUPLE ? r.value.values.length : 1
+          ),
+        );
+        let defaultReturn;
+        if (returnTupleArity === 1) {
+          defaultReturn = 'nil';
+        } else {
+          defaultReturn = `(mv ${
+            Array.from({ length: returnTupleArity }).fill('nil').join(' ')
+          })`;
+        }
         const constraints = root.parameters.map((p) =>
           printTypeConstraint(p, structTypes)
         ).join(
@@ -117,7 +131,7 @@ export function print(root: Program) {
             (defun ${root.name} (${params})
               (declare (xargs :guard ${constraints} ${measure}))
               (if (not ${constraints})
-                nil
+                ${defaultReturn}
                 ${body}))
           `;
         }
@@ -125,7 +139,7 @@ export function print(root: Program) {
         (defun ${root.name} (${params})
           (declare (xargs :guard (and ${constraints}) ${measure}))
           (if (not (and ${constraints}))
-            nil
+            ${defaultReturn}
             ${body}))
         `;
       }
@@ -360,5 +374,29 @@ export function print(root: Program) {
           `Unknown parameter type ${parameter.paramType}`,
         );
     }
+  }
+
+  function findReturns(s: Statement): Return[] {
+    const returns = [];
+    const { contents } = s;
+    if (contents.type === NodeType.RETURN) {
+      returns.push(contents);
+    }
+    if (contents.type === NodeType.IF) {
+      returns.push(...findReturns(contents.body));
+      let next = contents.elseBranch;
+      while (next) {
+        returns.push(...findReturns(next.body));
+        if (next.type === NodeType.IF) {
+          next = next.elseBranch;
+        } else if (next.type === NodeType.ELSE) {
+          next = null;
+        }
+      }
+    }
+    if (s.rest) {
+      returns.push(...findReturns(s.rest));
+    }
+    return returns;
   }
 }
