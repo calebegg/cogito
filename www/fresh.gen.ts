@@ -7,6 +7,7 @@ import * as $_app from './routes/_app.tsx';
 import * as $advanced from './routes/advanced.tsx';
 import * as $for_acl2_power_users from './routes/for-acl2-power-users.tsx';
 import * as $index from './routes/index.tsx';
+import * as $msort from './routes/msort.tsx';
 import * as $Try from './islands/Try.tsx';
 import { type Manifest } from '$fresh/server.ts';
 
@@ -17,6 +18,7 @@ const manifest = {
     './routes/advanced.tsx': $advanced,
     './routes/for-acl2-power-users.tsx': $for_acl2_power_users,
     './routes/index.tsx': $index,
+    './routes/msort.tsx': $msort,
   },
   islands: {
     './islands/Try.tsx': $Try,

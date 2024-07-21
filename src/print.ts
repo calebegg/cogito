@@ -101,17 +101,21 @@ export function print(root: Program) {
           ' ',
         );
         const params = root.parameters.map((p) => printNode(p)).join(' ');
+        const measure = root.measure
+          ? `:measure ${printNode(root.measure)}`
+          : '';
         const body = printNode(root.body);
         if (root.parameters.length === 0) {
           return outdent`
             (defun ${root.name} ()
+              ${measure ? `(declare (xargs ${measure}))` : ''}
               ${body})
           `;
         }
         if (root.parameters.length === 1) {
           return outdent`
             (defun ${root.name} (${params})
-              (declare (xargs :guard ${constraints}))
+              (declare (xargs :guard ${constraints} ${measure}))
               (if (not ${constraints})
                 nil
                 ${body}))
@@ -119,7 +123,7 @@ export function print(root: Program) {
         }
         return outdent`
         (defun ${root.name} (${params})
-          (declare (xargs :guard (and ${constraints})))
+          (declare (xargs :guard (and ${constraints}) ${measure}))
           (if (not (and ${constraints}))
             nil
             ${body}))

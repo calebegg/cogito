@@ -188,6 +188,7 @@ snapshot[`parse a basic program 1`] = `
         },
         type: 18,
       },
+      measure: undefined,
       name: "foo",
       parameters: [
         {

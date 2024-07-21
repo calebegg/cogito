@@ -12,7 +12,7 @@ snapshot[`print a basic program 1`] = `
 (include-book "arithmetic-5/top" :dir :system)
 
 (defun foo (x)
-  (declare (xargs :guard (rationalp x)))
+  (declare (xargs :guard (rationalp x) ))
   (if (not (rationalp x))
     nil
     (if (equal x 0)
@@ -47,7 +47,7 @@ snapshot[`works with struct types 1`] = `
   ((x (rationalp x)) (y (rationalp y))))
 
 (defun foo (p)
-  (declare (xargs :guard (point-p p)))
+  (declare (xargs :guard (point-p p) ))
   (if (not (point-p p))
     nil
     (+ (assoc 'x p) (assoc 'y p))))\`
@@ -57,7 +57,7 @@ snapshot[`works with switch 1`] = `
 '
 
 (defun foo (x)
-  (declare (xargs :guard (rationalp x)))
+  (declare (xargs :guard (rationalp x) ))
   (if (not (rationalp x))
     nil
     (cond ((equal x 1) "a")

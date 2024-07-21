@@ -68,6 +68,7 @@ interface Main extends NodeMixin<NodeType.MAIN> {
 interface Function extends NodeMixin<NodeType.FUNCTION> {
   name: string;
   parameters: Parameter[];
+  measure?: Expr;
   body: Statement;
 }
 
@@ -281,12 +282,21 @@ export function parse(tokens: Token[]) {
     const parameters = parseParameters();
     expect(TokenType.RIGHT_PAREN);
     expect(TokenType.LEFT_BRACE);
+    let measure;
+    if (tokens[current].type === TokenType.MEASURE) {
+      expect(TokenType.MEASURE);
+      expect(TokenType.LEFT_PAREN);
+      measure = parseExpr();
+      expect(TokenType.RIGHT_PAREN);
+      expect(TokenType.SEMICOLON);
+    }
     const body = parseStatement();
     expect(TokenType.RIGHT_BRACE);
     return {
       type: NodeType.FUNCTION,
       name: name,
       parameters,
+      measure,
       body,
     };
   }
