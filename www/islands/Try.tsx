@@ -218,6 +218,8 @@ Form:\\s+\\( ([A-Z:-]+) (.*) \\.\\.\\.\\)`),
     return { state, message: `Proof of ${summaryMatch[2]}` };
   } else if (summaryMatch[1] === 'MUTUAL-RECURSION') {
     return { state, message: `Admission of mutually recursive functions` };
+  } else if (summaryMatch[1] === 'DEFCONST') {
+    return { state, message: `Declaration of const ${summaryMatch[2]}` };
   } else if (structMatch) {
     return { state, message: `Generating struct ${structMatch[1]}` };
   } else if (output.includes('Assertion failed')) {

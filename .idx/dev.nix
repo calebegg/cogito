@@ -18,7 +18,7 @@
       # Runs when a workspace is first created
       onCreate = {
         deno-install = "curl -fsSL https://deno.land/install.sh | sh";
-        deno-path-add = "echo 'PATH=$PATH:~/.deno/bin >> ~/.bashrc";
+        deno-path-add = "echo 'PATH=$PATH:~/.deno/bin' >> ~/.bashrc";
       };
       # Runs when the workspace is (re)started
       onStart = {
