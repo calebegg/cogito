@@ -212,7 +212,7 @@ Form:\\s+\\( ([A-Z:-]+) (.*) \\.\\.\\.\\)`),
   ) {
     return null;
   } else if (summaryMatch[1] === 'INCLUDE-BOOK') {
-    return { state, message: 'Importing ${summaryMatch[2]}' };
+    return { state, message: `Importing ${summaryMatch[2]}` };
   } else if (summaryMatch[1] === 'DEFUN') {
     return { state, message: `Admission of ${summaryMatch[2]}` };
   } else if (summaryMatch[1] === 'DEFTHM') {
