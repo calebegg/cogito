@@ -27,15 +27,14 @@ theorem |rev twice returns original list|(xs: list) {
   return rev(rev(xs)) == xs
 }
 
-// TODO: add measure
-function merge(xs: list, ys: list) {
+function merge(xs: list, ys: list; some-guard) {
   if (empty(xs)) return ys;
   if (empty(ys)) return xs;
   if (first(xs) < first(ys)) {
     return [first(xs), ...merge(rest(xs), ys)];
   }
   return [first(ys), ...merge(xs, rest(ys))];
-}
+} where len(xs) + len(ys) terminates;
 
 function foo() {
   x = 3;
