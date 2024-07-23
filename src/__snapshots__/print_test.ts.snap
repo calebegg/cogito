@@ -73,3 +73,15 @@ snapshot[`returns appropriate tuples 1`] = `
     (mv nil nil)
     (mv x (+ x 1))))"
 `;
+
+snapshot[`parses lambdas with block bodies 1`] = `
+"
+
+(defun foo (x)
+  (declare (xargs :guard (rationalp x) ))
+  (if (not (rationalp x))
+    nil
+    (bar (lambda\$ (x y)
+  (declare (xargs :guard (and (rationalp x) (rationalp y)))) (let ((sum (+ x y)))
+sum)))))"
+`;

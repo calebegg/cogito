@@ -69,7 +69,7 @@ Deno.test('check returns in some basic functions [negative]', () => {
 
   test(outdent`
     function foo(x: number) {
-        assert(x > 0);
+      assert(x > 0);
     }
   `);
   test(outdent`

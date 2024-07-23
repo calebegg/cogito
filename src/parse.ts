@@ -195,7 +195,7 @@ interface Tuple extends NodeMixin<NodeType.TUPLE> {
 
 interface Lambda extends NodeMixin<NodeType.LAMBDA> {
   parameters: Parameter[];
-  body: Expr;
+  body: Expr | Statement;
 }
 
 export interface Switch extends NodeMixin<NodeType.SWITCH> {
@@ -270,10 +270,10 @@ export function parse(tokens: Token[]) {
     } else {
       throw errorWhileParsing(
         outdent`
-          Expected a declaration, got ${TT[curr().type]}
-          Every top level expression must be a declaration. To have code
-          that executes at the top level, introduce a 'main' declaration.
-        `.trim(),
+          Expected a declaration, got ${TT[curr().type]} Every top level
+          expression must be a declaration. To have code that executes at the
+          top level, introduce a 'main' declaration.
+        `,
       );
     }
   }
@@ -524,9 +524,7 @@ export function parse(tokens: Token[]) {
 
   function parseMain(): Main {
     if (hasMain) {
-      throw error(
-        curr().line,
-        curr().char,
+      throw errorWhileParsing(
         'Only one main declaration is allowed',
       );
     }
@@ -754,8 +752,14 @@ export function parse(tokens: Token[]) {
     const parameters = parseParameters();
     expect(TT.RIGHT_PAREN);
     expect(TT.FAT_ARROW);
-    // TODO: Support block bodies
-    const body = parseExpr();
+    let body;
+    if (curr().type === TT.LEFT_BRACE) {
+      expect(TT.LEFT_BRACE);
+      body = parseStatement();
+      expect(TT.RIGHT_BRACE);
+    } else {
+      body = parseExpr();
+    }
     return {
       type: NodeType.LAMBDA,
       parameters,

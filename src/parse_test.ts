@@ -64,7 +64,7 @@ Deno.test('top level code throws', () => {
   assertThrows(
     () => parse(scan(`foo();`)),
     Error,
-    'Every top level expression',
+    'Every top level',
   );
 });
 

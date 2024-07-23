@@ -128,3 +128,23 @@ Deno.test('returns appropriate tuples', async (t) => {
     ),
   );
 });
+
+Deno.test('parses lambdas with block bodies', async (t) => {
+  await assertSnapshot(
+    t,
+    print(
+      parse(
+        scan(
+          outdent`
+            function foo(x: number) {
+              return bar((x: number, y: number) => {
+                sum = x + y;
+                return sum;
+              });
+            }
+          `,
+        ),
+      ),
+    ),
+  );
+});
