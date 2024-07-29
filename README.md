@@ -1,5 +1,15 @@
 # [Cogito](https://cogitolang.org)
 
+Cogito is a small, simple, and expressive programming language that
+uses the [ACL2 theorem prover](https://www.cs.utexas.edu/~moore/acl2/)
+to execute functions and prove theorems.
+
+## Getting Started
+
+The easiest way to get started with Cogito is to visit [the
+website](https://cogitolang.org), which provides a playground in which
+you can write and run Cogito programs.
+
 ## Examples
 
 ```c
@@ -54,3 +64,25 @@ function sum(xs: list<number>) {
   }
 }
 ```
+
+## Development
+
+Cogito runs on top of [Deno](https://deno.com/). To build and run the
+website locally, install [Deno](https://deno.com/) and then run the
+following command in the top-level directory of this repo:
+
+```bash
+deno task www
+```
+
+This will install any needed dependencies and set up a development
+server, typically at `localhost:8000`. The URL that the site is being
+served at will be printed to the terminal, so navigate there in your
+browser to play around with the site!
+
+Note that even a local version of the Cogito website will use a
+predeployed ACL2 backend when evaluating ACL2 forms. The source for
+the backend is provided in the [Proof Pad
+repo](https://github.com/calebegg/proof-pad), but more complete
+documentation on deploying the ACL2 backend and configuring the Cogito
+website to use it is a work in progress.
