@@ -16,6 +16,7 @@ export enum NodeType {
   ELSE,
   FUNCTION_CALL,
   FUNCTION,
+  HINTS,
   IF,
   IMPORT,
   LAMBDA,
@@ -23,6 +24,7 @@ export enum NodeType {
   MAIN,
   MUTUAL,
   PARAMETER,
+  PREFACE,
   PRINT,
   PROGRAM,
   RETURN,
@@ -68,6 +70,7 @@ interface Main extends NodeMixin<NodeType.MAIN> {
 interface Function extends NodeMixin<NodeType.FUNCTION> {
   name: string;
   parameters: Parameter[];
+  preface: Preface;
   measure?: Expr;
   body: Statement;
 }
@@ -75,6 +78,7 @@ interface Function extends NodeMixin<NodeType.FUNCTION> {
 interface Theorem extends NodeMixin<NodeType.THEOREM> {
   name: string;
   parameters: Parameter[];
+  preface: Preface;
   // What happens if you do `cw` in a theorem??
   body: Statement;
 }
@@ -103,6 +107,17 @@ export interface Parameter extends NodeMixin<NodeType.PARAMETER> {
   char: number;
   name: string;
   paramType: string;
+}
+
+export interface Preface extends NodeMixin<NodeType.PREFACE> {
+  measure?: Expr;
+  guard?: Expr;
+  hints?: Hints;
+  def?: Expr;
+}
+
+export interface Hints extends NodeMixin<NodeType.HINTS> {
+  values: Array<{ about: string; value: string }>;
 }
 
 export interface Statement extends NodeMixin<NodeType.STATEMENT> {
@@ -285,6 +300,7 @@ export function parse(tokens: Token[]) {
     expect(TT.LEFT_PAREN);
     const parameters = parseParameters();
     expect(TT.RIGHT_PAREN);
+    const preface = parsePreface();
     expect(TT.LEFT_BRACE);
     let measure;
     if (curr().type === TT.MEASURE) {
@@ -300,6 +316,7 @@ export function parse(tokens: Token[]) {
       type: NodeType.FUNCTION,
       name: name,
       parameters,
+      preface,
       measure,
       body,
     };
@@ -312,6 +329,7 @@ export function parse(tokens: Token[]) {
     expect(TT.LEFT_PAREN);
     const parameters = parseParameters();
     expect(TT.RIGHT_PAREN);
+    const preface = parsePreface();
     expect(TT.LEFT_BRACE);
     const body = parseStatement();
     expect(TT.RIGHT_BRACE);
@@ -319,6 +337,7 @@ export function parse(tokens: Token[]) {
       type: NodeType.THEOREM,
       name,
       parameters,
+      preface,
       body,
     };
   }
@@ -370,6 +389,65 @@ export function parse(tokens: Token[]) {
       }
     }
     return parameters;
+  }
+
+  function parsePreface(): Preface {
+    let measure: Expr | undefined = undefined;
+    let guard: Expr | undefined = undefined;
+    let hints: Hints | undefined = undefined;
+    let def: Expr | undefined = undefined;
+    while (curr().type !== TT.LEFT_BRACE) {
+      switch (curr().type) {
+        case TT.MEASURE:
+          expect(TT.MEASURE);
+          expect(TT.COLON);
+          measure = parseExpr();
+          break;
+        case TT.GUARD:
+          expect(TT.GUARD);
+          expect(TT.COLON);
+          guard = parseExpr();
+          break;
+        case TT.HINTS:
+          expect(TT.HINTS);
+          expect(TT.COLON);
+          hints = parseHints();
+          break;
+        case TT.DEFAULT:
+          expect(TT.DEFAULT);
+          expect(TT.COLON);
+          def = parseExpr();
+          break;
+        default:
+          throw errorWhileParsing(
+            `Unexpected ${TT[curr().type]} while parsing preface`,
+          );
+      }
+      if (curr().type === TT.SEMICOLON) {
+        expect(TT.SEMICOLON);
+      } else {
+        break;
+      }
+    }
+    return { type: NodeType.PREFACE, measure, guard, hints, def };
+  }
+
+  function parseHints(): Hints {
+    const values: Array<{ about: string; value: string }> = [];
+    expect(TT.LEFT_BRACE);
+    do {
+      const about = expect(TT.STRING).literal!;
+      expect(TT.COLON);
+      const value = expect(TT.IDENTIFIER).lexeme;
+      values.push({ about, value });
+      if (curr().type === TT.COMMA) {
+        expect(TT.COMMA);
+      } else {
+        break;
+      }
+    } while (curr().type !== TT.RIGHT_BRACE);
+    expect(TT.RIGHT_BRACE);
+    return { type: NodeType.HINTS, values };
   }
 
   // parameter -> IDENTIFIER ':' type

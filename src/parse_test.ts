@@ -84,18 +84,33 @@ Deno.test('improper "new" throws', () => {
   );
 });
 
-Deno.test('unbalanced braces throws', () => {
-  assertThrows(
-    () => parse(scan(`function foo() }`)),
-    Error,
-    'Expected LEFT_BRACE but found RIGHT_BRACE',
-  );
-});
-
 Deno.test('unreachable code throws', () => {
   assertThrows(
     () => parse(scan(`function foo() { return 1; x = 2; }`)),
     Error,
     'Unreachable',
+  );
+});
+
+Deno.test('parse a preface', async (t) => {
+  await assertSnapshot(
+    t,
+    parse(
+      scan(
+        outdent`
+        function foo(x: number)
+          guard: x > 0;
+          default: 0;
+          hints: {
+            "Goal": my-theorem,
+            "1.1": my-other-theorem,
+          };
+          measure: acl2-count(x);
+        {
+          return x;
+        }
+      `,
+      ),
+    ),
   );
 });

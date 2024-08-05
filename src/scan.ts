@@ -50,6 +50,8 @@ export enum TokenType {
   FALSE,
   FROM,
   FUNCTION,
+  GUARD,
+  HINTS,
   IF,
   IMPORT,
   MAIN,
@@ -69,12 +71,15 @@ export enum TokenType {
 
 const KEYWORDS = new Map([
   ['assert', TokenType.ASSERT],
+  ['case', TokenType.CASE],
   ['const', TokenType.CONST],
   ['default', TokenType.DEFAULT],
   ['else', TokenType.ELSE],
   ['false', TokenType.FALSE],
   ['from', TokenType.FROM],
   ['function', TokenType.FUNCTION],
+  ['guard', TokenType.GUARD],
+  ['hints', TokenType.HINTS],
   ['if', TokenType.IF],
   ['import', TokenType.IMPORT],
   ['main', TokenType.MAIN],
@@ -85,10 +90,9 @@ const KEYWORDS = new Map([
   ['print', TokenType.PRINT],
   ['return', TokenType.RETURN],
   ['struct', TokenType.STRUCT],
+  ['switch', TokenType.SWITCH],
   ['theorem', TokenType.THEOREM],
   ['true', TokenType.TRUE],
-  ['switch', TokenType.SWITCH],
-  ['case', TokenType.CASE],
 ]);
 
 export interface Token {

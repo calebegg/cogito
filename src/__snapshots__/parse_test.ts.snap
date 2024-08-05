@@ -10,16 +10,16 @@ snapshot[`parse a basic program 1`] = `
             "x",
             "y",
           ],
-          type: 23,
+          type: 25,
           value: {
-            type: 24,
+            type: 26,
             values: [
               {
-                type: 21,
+                type: 23,
                 value: "y",
               },
               {
-                type: 21,
+                type: 23,
                 value: "x",
               },
             ],
@@ -32,24 +32,24 @@ snapshot[`parse a basic program 1`] = `
             value: {
               contents: [
                 {
-                  type: 21,
+                  type: 23,
                   value: "x",
                 },
                 {
                   char: 21,
                   line: 3,
-                  type: 17,
+                  type: 19,
                   value: {
-                    type: 21,
+                    type: 23,
                     value: "list",
                   },
                 },
                 {
-                  type: 21,
+                  type: 23,
                   value: "y",
                 },
               ],
-              type: 10,
+              type: 11,
             },
           },
           rest: {
@@ -59,11 +59,11 @@ snapshot[`parse a basic program 1`] = `
               value: {
                 args: [
                   {
-                    type: 21,
+                    type: 23,
                     value: "2",
                   },
                   {
-                    type: 21,
+                    type: 23,
                     value: "3",
                   },
                 ],
@@ -76,11 +76,11 @@ snapshot[`parse a basic program 1`] = `
                 name: "y",
                 type: 1,
                 value: {
-                  type: 24,
+                  type: 26,
                   values: [
                     {
                       left: {
-                        type: 21,
+                        type: 23,
                         value: "p",
                       },
                       right: "x",
@@ -88,7 +88,7 @@ snapshot[`parse a basic program 1`] = `
                     },
                     {
                       left: {
-                        type: 21,
+                        type: 23,
                         value: "p",
                       },
                       right: "y",
@@ -99,7 +99,7 @@ snapshot[`parse a basic program 1`] = `
               },
               rest: {
                 contents: {
-                  type: 16,
+                  type: 18,
                   value: {
                     args: [
                       {
@@ -107,11 +107,11 @@ snapshot[`parse a basic program 1`] = `
                           {
                             args: [
                               {
-                                type: 21,
+                                type: 23,
                                 value: "1",
                               },
                               {
-                                type: 21,
+                                type: 23,
                                 value: "x",
                               },
                             ],
@@ -119,7 +119,7 @@ snapshot[`parse a basic program 1`] = `
                             type: 5,
                           },
                           {
-                            type: 21,
+                            type: 23,
                             value: '"hello"',
                           },
                         ],
@@ -131,7 +131,7 @@ snapshot[`parse a basic program 1`] = `
                           {
                             args: [
                               {
-                                type: 21,
+                                type: 23,
                                 value: "true",
                               },
                               {
@@ -141,11 +141,11 @@ snapshot[`parse a basic program 1`] = `
                                       {
                                         args: [
                                           {
-                                            type: 21,
+                                            type: 23,
                                             value: "3",
                                           },
                                           {
-                                            type: 21,
+                                            type: 23,
                                             value: "false",
                                           },
                                         ],
@@ -153,7 +153,7 @@ snapshot[`parse a basic program 1`] = `
                                         type: 5,
                                       },
                                       {
-                                        type: 21,
+                                        type: 23,
                                         value: "nil",
                                       },
                                     ],
@@ -178,15 +178,15 @@ snapshot[`parse a basic program 1`] = `
                   },
                 },
                 rest: null,
-                type: 18,
+                type: 20,
               },
-              type: 18,
+              type: 20,
             },
-            type: 18,
+            type: 20,
           },
-          type: 18,
+          type: 20,
         },
-        type: 18,
+        type: 20,
       },
       measure: undefined,
       name: "foo",
@@ -196,9 +196,16 @@ snapshot[`parse a basic program 1`] = `
           line: 1,
           name: "x",
           paramType: "number",
-          type: 13,
+          type: 14,
         },
       ],
+      preface: {
+        def: undefined,
+        guard: undefined,
+        hints: undefined,
+        measure: undefined,
+        type: 15,
+      },
       type: 6,
     },
     {
@@ -211,29 +218,29 @@ snapshot[`parse a basic program 1`] = `
               {
                 contents: [
                   {
-                    type: 21,
+                    type: 23,
                     value: "1",
                   },
                   {
-                    type: 21,
+                    type: 23,
                     value: "2",
                   },
                   {
-                    type: 21,
+                    type: 23,
                     value: "3",
                   },
                 ],
-                type: 10,
+                type: 11,
               },
               {
                 body: {
                   args: [
                     {
-                      type: 21,
+                      type: 23,
                       value: "x",
                     },
                     {
-                      type: 21,
+                      type: 23,
                       value: "y",
                     },
                   ],
@@ -246,20 +253,20 @@ snapshot[`parse a basic program 1`] = `
                     line: 10,
                     name: "x",
                     paramType: "number",
-                    type: 13,
+                    type: 14,
                   },
                   {
                     char: 37,
                     line: 10,
                     name: "y",
                     paramType: "number",
-                    type: 13,
+                    type: 14,
                   },
                 ],
-                type: 9,
+                type: 10,
               },
               {
-                type: 21,
+                type: 23,
                 value: "0",
               },
             ],
@@ -276,29 +283,29 @@ snapshot[`parse a basic program 1`] = `
                 {
                   contents: [
                     {
-                      type: 21,
+                      type: 23,
                       value: "1",
                     },
                     {
-                      type: 21,
+                      type: 23,
                       value: "2",
                     },
                     {
-                      type: 21,
+                      type: 23,
                       value: "3",
                     },
                   ],
-                  type: 10,
+                  type: 11,
                 },
                 {
                   body: {
                     args: [
                       {
-                        type: 21,
+                        type: 23,
                         value: "x",
                       },
                       {
-                        type: 21,
+                        type: 23,
                         value: "1",
                       },
                     ],
@@ -311,10 +318,10 @@ snapshot[`parse a basic program 1`] = `
                       line: 11,
                       name: "x",
                       paramType: "number",
-                      type: 13,
+                      type: 14,
                     },
                   ],
-                  type: 9,
+                  type: 10,
                 },
               ],
               name: "map",
@@ -323,13 +330,13 @@ snapshot[`parse a basic program 1`] = `
           },
           rest: {
             contents: {
-              type: 16,
+              type: 18,
               value: {
                 args: [
                   {
                     args: [
                       {
-                        type: 21,
+                        type: 23,
                         value: "3",
                       },
                     ],
@@ -337,7 +344,7 @@ snapshot[`parse a basic program 1`] = `
                     type: 5,
                   },
                   {
-                    type: 21,
+                    type: 23,
                     value: "0",
                   },
                 ],
@@ -346,11 +353,11 @@ snapshot[`parse a basic program 1`] = `
               },
             },
             rest: null,
-            type: 18,
+            type: 20,
           },
-          type: 18,
+          type: 20,
         },
-        type: 18,
+        type: 20,
       },
       name: "|foo works|",
       parameters: [
@@ -359,16 +366,23 @@ snapshot[`parse a basic program 1`] = `
           line: 9,
           name: "x",
           paramType: "number",
-          type: 13,
+          type: 14,
         },
       ],
-      type: 22,
+      preface: {
+        def: undefined,
+        guard: undefined,
+        hints: undefined,
+        measure: undefined,
+        type: 15,
+      },
+      type: 24,
     },
     {
       name: "*foo*",
       type: 2,
       value: {
-        type: 21,
+        type: 23,
         value: "1",
       },
     },
@@ -380,36 +394,113 @@ snapshot[`parse a basic program 1`] = `
           line: 17,
           name: "x",
           paramType: "number",
-          type: 13,
+          type: 14,
         },
         {
           char: 23,
           line: 17,
           name: "y",
           paramType: "number",
-          type: 13,
+          type: 14,
         },
       ],
-      type: 19,
+      type: 21,
     },
     {
       body: {
         contents: {
           expressions: [
             {
-              type: 21,
+              type: 23,
               value: '"world"',
             },
           ],
           template: '"hello, ~x0!"',
-          type: 14,
+          type: 16,
         },
         rest: null,
-        type: 18,
+        type: 20,
       },
-      type: 11,
+      type: 12,
     },
   ],
-  type: 15,
+  type: 17,
+}
+`;
+
+snapshot[`parse a preface 1`] = `
+{
+  declarations: [
+    {
+      body: {
+        contents: {
+          type: 18,
+          value: {
+            type: 23,
+            value: "x",
+          },
+        },
+        rest: null,
+        type: 20,
+      },
+      measure: undefined,
+      name: "foo",
+      parameters: [
+        {
+          char: 14,
+          line: 1,
+          name: "x",
+          paramType: "number",
+          type: 14,
+        },
+      ],
+      preface: {
+        def: {
+          type: 23,
+          value: "0",
+        },
+        guard: {
+          args: [
+            {
+              type: 23,
+              value: "x",
+            },
+            {
+              type: 23,
+              value: "0",
+            },
+          ],
+          name: ">",
+          type: 5,
+        },
+        hints: {
+          type: 7,
+          values: [
+            {
+              about: '"Goal"',
+              value: "my-theorem",
+            },
+            {
+              about: '"1.1"',
+              value: "my-other-theorem",
+            },
+          ],
+        },
+        measure: {
+          args: [
+            {
+              type: 23,
+              value: "x",
+            },
+          ],
+          name: "acl2-count",
+          type: 5,
+        },
+        type: 15,
+      },
+      type: 6,
+    },
+  ],
+  type: 17,
 }
 `;
