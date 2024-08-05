@@ -30,21 +30,30 @@ export default function Sorting() {
               return len(insert(x, list)) == len(list) + 1;
             }
             
+            function is-ordered(xs: list<number>) {
+              if (is-empty(xs) || len(xs) == 1) {
+                return true;
+              } else {
+                return first(xs) <= second(xs) && is-ordered(rest(xs));
+              }
+            }
+            
             function isort(xs: list<number>) {
-              if (is-empty(xs)) {
-                return [];
+              if (is-empty(rest(xs))) {
+                return xs;
               }
               return insert(first(xs), isort(rest(xs)));
             }
             
-            theorem |isort preserves length|(list: list<number>) {
-              return len(isort(list)) == len(list);
+            theorem |isort sorts|(list: list<number>) {
+              return is-ordered(isort(list));
             }
             
             const *jenny* = [8, 6, 7, 5, 3, 0, 9];
             
             main {
               print("~x0", isort(*jenny*));
+              print("~x0", is-ordered(isort(*jenny*)));
             }
           `}
         />
